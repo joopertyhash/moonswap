@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom'
-import UnicornSvg from "../components/UnicornSvg";
+import Logo from '../components/Logo'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Header from '../components/Header'
@@ -27,6 +27,17 @@ const AppWrapper = styled.div`
   align-items: flex-start;
   overflow-x: hidden;
   height: 100vh;
+`
+
+const LogoWrapper = styled.div`
+  display: none;
+  
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: block;
+    padding-left: 65px;
+    margin: 15px;
+    position: relative;
+  `};
 `
 
 const HeaderWrapper = styled.div`
@@ -60,7 +71,11 @@ export default function App() {
         <Route component={GoogleAnalyticsReporter} />
         <Route component={DarkModeQueryParamReader} />
         <AppWrapper>
-          <UnicornSvg mobile={true} />
+          <LogoWrapper>
+            <Logo mobile={true}/>
+            <h1 className="mainWordmark">Mooniswap</h1>
+            <h4 className="mainHeader">Next generation AMM protocol by 1inch team</h4>
+          </LogoWrapper>
           <HeaderWrapper>
             <Header />
           </HeaderWrapper>
