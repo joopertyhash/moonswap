@@ -14,8 +14,9 @@ export const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0
 export const USDT = new Token(ChainId.MAINNET, '0xdAC17F958D2ee523a2206206994597C13D831ec7', 6, 'USDT', 'Tether USD')
 export const COMP = new Token(ChainId.MAINNET, '0xc00e94Cb662C3520282E6f5717214004A7f26888', 18, 'COMP', 'Compound')
 export const MKR = new Token(ChainId.MAINNET, '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', 18, 'MKR', 'Maker')
+export const CHI = new Token(ChainId.MAINNET, '0x0000000000004946c0e9F43F4Dee607b0eF1fA1c', 0, 'CHI', 'Chi Gastoken by 1inch')
 
-const WETH_ONLY: ChainTokenList = {
+const ETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [ETHER],
   [ChainId.ROPSTEN]: [ETHER],
   [ChainId.RINKEBY]: [ETHER],
@@ -25,20 +26,20 @@ const WETH_ONLY: ChainTokenList = {
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  ...WETH_ONLY,
-  [ChainId.MAINNET]: [DAI, USDC, USDT, COMP, MKR]
+  ...ETH_ONLY,
+  [ChainId.MAINNET]: [DAI, USDC, USDT, COMP, MKR, CHI]
 }
 
 // used for display in the default list when adding liquidity
 export const SUGGESTED_BASES: ChainTokenList = {
-  ...WETH_ONLY,
-  [ChainId.MAINNET]: [DAI, USDC, USDT]
+  ...ETH_ONLY,
+  [ChainId.MAINNET]: [DAI, USDC, USDT, CHI]
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
-  ...WETH_ONLY,
-  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT]
+  ...ETH_ONLY,
+  [ChainId.MAINNET]: [ETHER, DAI, USDC, USDT, CHI]
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
@@ -48,7 +49,10 @@ export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } 
       new Token(ChainId.MAINNET, '0x39AA39c021dfbaE8faC545936693aC917d5E7563', 8, 'cUSDC', 'Compound USD Coin')
     ],
     [USDC, USDT],
-    [DAI, USDT]
+    [DAI, USDT],
+    [ETHER, CHI],
+    [USDC, CHI],
+    [ETHER, USDC]
   ]
 }
 
@@ -150,4 +154,4 @@ export const BETTER_TRADE_LINK_THRESHOLD = new Percent(JSBI.BigInt(75), JSBI.Big
 
 // the Uniswap Default token list lives here
 export const DEFAULT_TOKEN_LIST_URL =
-  'https://gateway.ipfs.io/ipfs/QmQWNZqGv4MTRACFmfymYqaDAcWTqx6DYifjpkVdSmMoCQ'
+  'https://gateway.ipfs.io/ipfs/QmVNGFWbvS63enYRigY1NyWDmuBvTmK98Yn94ZYtUL4uRA'

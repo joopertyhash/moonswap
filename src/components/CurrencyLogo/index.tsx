@@ -8,7 +8,12 @@ import uriToHttp from '../../utils/uriToHttp'
 
 const getTokenLogoURL = address =>
   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+
+const getTokenLogoURL1inch = address =>
+  `https://1inch.exchange/assets/tokens/${address.toLowerCase()}.png`
+
 const BAD_URIS: { [tokenAddress: string]: true } = {}
+const FALLBACK_URIS: { [tokenAddress: string]: string } = {}
 
 const Image = styled.img<{ size: string }>`
   width: ${({ size }) => size};
@@ -64,6 +69,9 @@ export default function CurrencyLogo({
       if (!BAD_URIS[defaultUri]) {
         uri = defaultUri
       }
+      if (FALLBACK_URIS[currency.address]) {
+        uri = FALLBACK_URIS[currency.address]
+      }
     }
 
     if (uri) {
@@ -76,6 +84,7 @@ export default function CurrencyLogo({
           onError={() => {
             if (currency instanceof Token) {
               BAD_URIS[uri] = true
+              FALLBACK_URIS[currency.address] = getTokenLogoURL1inch(currency.address)
             }
             refresh(i => i + 1)
           }}
