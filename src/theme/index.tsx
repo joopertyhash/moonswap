@@ -13,6 +13,7 @@ import { Colors } from './styled'
 export * from './components'
 
 export const MEDIA_WIDTHS = {
+  upToTheSmallest: 360,
   upToExtraSmall: 500,
   upToSmall: 600,
   upToMedium: 960,
@@ -175,6 +176,14 @@ export const FixedGlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" rel="stylesheet');
 @import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
 
+.onlyDesktop {
+  display: block;
+}
+
+.onlyMobile {
+  display: none;
+}
+
 .mainWordmark {
   font-family: Quicksand, serif;
   margin-top: 5px;
@@ -205,13 +214,33 @@ html, input, textarea, button {
 }
 
 @media (max-width: ${(MEDIA_WIDTHS as any)['upToSmall']}px) {
-  .mainWordmark {
-    margin-top: 5px;
-    margin-bottom: 10px;
+  .onlyDesktop {
+    display: none;
+  }
+  
+  .onlyMobile {
+    display: block;
   }
 
-  .mainHeader {
-    display: none
+  .mainWordmark {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: left;
+    font-size: 24px;
+  }
+
+  h4.mainHeader {
+    text-align: left;
+    font-family: Quicksand, serif;
+    text-transform: none;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: ${(MEDIA_WIDTHS as any)['upToTheSmallest']}px) {
+  h4.mainHeader {
+    font-size: 11px;
   }
 }
 

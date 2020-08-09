@@ -30,9 +30,7 @@ const HeaderFrame = styled.div`
   top: 0;
   position: absolute;
   z-index: 2;
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    padding: 12px 0 0 0;
-    width: calc(100%);
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     position: relative;
   `};
 `
@@ -45,10 +43,6 @@ const HeaderElement = styled.div`
 const HeaderElementWrap = styled.div`
   display: flex;
   align-items: center;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    margin-top: 0.5rem;
-`};
 `
 
 const Title = styled.a`
@@ -113,16 +107,20 @@ const HeaderControls = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex-direction: column;
-    align-items: flex-end;
-  `};
 `
 
 const BalanceText = styled(Text)`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     display: none;
+  `};
+`
+
+const RowBetweenStyled = styled(RowBetween)`
+  padding: 1rem 1rem 0 1rem;
+  align-items: flex-start;
+  
+   ${({ theme }) => theme.mediaWidth.upToSmall`
+      padding: 1rem 1rem 0.5rem 1rem;
   `};
 `
 
@@ -142,7 +140,7 @@ export default function Header() {
 
   return (
     <HeaderFrame>
-      <RowBetween style={{ alignItems: 'flex-start' }} padding="1rem 1rem 0 1rem">
+      <RowBetweenStyled>
         <HeaderElement>
           <Title href=".">
             <UniIcon>
@@ -173,7 +171,7 @@ export default function Header() {
             <Menu />
           </HeaderElementWrap>
         </HeaderControls>
-      </RowBetween>
+      </RowBetweenStyled>
     </HeaderFrame>
   )
 }
