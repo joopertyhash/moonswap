@@ -172,8 +172,6 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" rel="stylesheet');
 @import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
 
 .onlyDesktop {
@@ -193,12 +191,11 @@ export const FixedGlobalStyle = createGlobalStyle`
 }
 
 h4.mainHeader {
-  font-family: 'Cormorant SC', serif;
+  font-family: Quicksand, serif;
   text-transform: uppercase;
   margin-top: 0;
   margin-bottom: 20px;
   font-weight: 400;
-  font-family: 'Open Sans';
 }
 
 html, input, textarea, button {
@@ -230,8 +227,8 @@ html, input, textarea, button {
   }
 
   h4.mainHeader {
-    text-align: left;
     font-family: Quicksand, serif;
+    text-align: left;
     margin-bottom: 0;
     font-size: 12px;
   }
