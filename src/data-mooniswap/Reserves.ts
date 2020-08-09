@@ -2,7 +2,7 @@ import { Pair, Token, TokenAmount } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from '../hooks'
 
-import { NEVER_RELOAD, useSingleCallResult, useSingleContractMultipleData } from '../state/multicall/hooks'
+import { useSingleContractMultipleData } from '../state/multicall/hooks'
 import { useMooniswapV1HelperContract } from '../hooks/useContract'
 // @ts-ignore
 import { V1_MOONISWAP_FACTORY_ADDRESSES } from '../constants/v1-mooniswap'

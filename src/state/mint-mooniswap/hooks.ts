@@ -120,7 +120,7 @@ export function useDerivedMintInfo(currencyA: Token | undefined, currencyB: Toke
     } else {
       return
     }
-  }, [parsedAmounts, chainId, pair, totalSupply])
+  }, [parsedAmounts, chainId, pair, totalSupply, isFirstCurrencyA])
 
   const poolTokenPercentage = useMemo(() => {
     if (liquidityMinted && totalSupply) {
