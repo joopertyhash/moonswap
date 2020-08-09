@@ -74,7 +74,7 @@ export default function App() {
           <LogoWrapper>
             <Logo mobile={true}/>
             <h1 className="mainWordmark">Mooniswap</h1>
-            <h4 className="mainHeader">Next generation AMM protocol by 1inch team</h4>
+            <h4 className="mainHeader">Next generation AMM protocol by 1inch</h4>
           </LogoWrapper>
           <HeaderWrapper>
             <Header />

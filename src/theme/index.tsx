@@ -232,7 +232,6 @@ html, input, textarea, button {
   h4.mainHeader {
     text-align: left;
     font-family: Quicksand, serif;
-    text-transform: none;
     margin-bottom: 0;
     font-size: 12px;
   }
@@ -240,7 +239,7 @@ html, input, textarea, button {
 
 @media (max-width: ${(MEDIA_WIDTHS as any)['upToTheSmallest']}px) {
   h4.mainHeader {
-    font-size: 11px;
+    font-size: 10px;
   }
 }
 
