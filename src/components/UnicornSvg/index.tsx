@@ -5,11 +5,11 @@ import {MEDIA_WIDTHS} from '../../theme/index';
 import styled from 'styled-components'
 
 const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , highlight?: boolean, mobile?: boolean }>`
-  color: #778293;
+  color: ${({ theme }) => theme.horse}
   position: absolute;
   left: 50%;
   width: 260px;
-  opacity: .2;
+  opacity: 0.1;
   margin-left: ${({ flip }) => flip ? '220px;' : '-480px;'}
   
   ${({ flip }) => flip && 'transform:scale(-1,1);'} 
@@ -17,12 +17,12 @@ const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , h
   ${({ mobile }) => mobile
   ? 'display: none;'
   : `:hover {
-      opacity: .4;
+      opacity: 1;
       g {
-        transition: .3s;
+        transition: .4s;
         
         path {
-          transition: .3s;
+          transition: .4s;
           stroke-width: 1;
         }
       }
@@ -30,12 +30,12 @@ const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , h
 } 
   
   ${({highlight}) => highlight && `
-      opacity: .4; transition: .3s;
+      opacity: 1; transition: .5s;
   `}
  
   g {
     path {
-      stroke-width: ${({ highlight }) => highlight ? '1' : '0'} 
+      stroke-width: ${({ highlight }) => highlight ? '1' : '1'} 
       stroke: ${({ stroke, theme }) => stroke ?? darken(0.3, theme.primary1)};
     }
   }
@@ -45,13 +45,13 @@ const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , h
   ? `
         display: block;
         position: fixed;
-        top: -17px;
-        left: -45px;
+        top: -37px;
+        left: -65px;
         width: 200px;
         height: auto;
-        opacity: .5;
+        opacity: .08;
         margin: 0;
-        transform:scale(-1,1);
+        transform:scale(-1,1) rotate(-12deg);
         z-index: -1;
       `
   : 'display: none;'} 
