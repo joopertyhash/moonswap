@@ -86,7 +86,7 @@ export function usePairs(currencies: [Token | undefined, Token | undefined][]): 
         )
       ])
     }
-    return pairStates
+    return pairStates.length !== 0 ? pairStates : [[PairState.LOADING, null]]
   }, [res, allTokenAList, allTokenBList])
 }
 
