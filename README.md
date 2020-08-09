@@ -56,7 +56,11 @@ You should have received a copy of the GNU General Public License along with thi
 #### Contact us
 - info@1inch.exchange
 
-Copyright © 2020, 1inch team. Released under GNU General Public License v3.0
+Copyright © 2020, 1inch limited.
+
+Copyright © 2020, [Uniswap](https://uniswap.org/).
+
+Released under GNU General Public License v3.0
 
 
 
