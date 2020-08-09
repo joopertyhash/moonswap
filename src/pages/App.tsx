@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom'
+import UnicornSvg from "../components/UnicornSvg";
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Header from '../components/Header'
@@ -25,6 +26,7 @@ const AppWrapper = styled.div`
   flex-flow: column;
   align-items: flex-start;
   overflow-x: hidden;
+  height: 100vh;
 `
 
 const HeaderWrapper = styled.div`
@@ -51,10 +53,6 @@ const BodyWrapper = styled.div`
   z-index: 1;
 `
 
-const Marginer = styled.div`
-  // margin-top: 5rem;
-`
-
 export default function App() {
   return (
     <Suspense fallback={null}>
@@ -62,6 +60,7 @@ export default function App() {
         <Route component={GoogleAnalyticsReporter} />
         <Route component={DarkModeQueryParamReader} />
         <AppWrapper>
+          <UnicornSvg mobile={true} />
           <HeaderWrapper>
             <Header />
           </HeaderWrapper>
@@ -84,7 +83,6 @@ export default function App() {
                 <Route component={RedirectPathToSwapOnly} />
               </Switch>
             </Web3ReactManager>
-            <Marginer />
           </BodyWrapper>
         </AppWrapper>
       </HashRouter>

@@ -44,12 +44,12 @@ const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , h
     ${({ mobile }) => mobile === true
   ? `
         display: block;
-        position: fixed;
+        position: absolute;
         top: -17px;
         left: -45px;
         width: 200px;
         height: auto;
-        opacity: .5;
+        opacity: .3;
         margin: 0;
         transform:scale(-1,1);
         z-index: -1;

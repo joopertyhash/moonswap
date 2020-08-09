@@ -172,23 +172,19 @@ export const FixedGlobalStyle = createGlobalStyle`
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" rel="stylesheet');
-
-.mainHeader {
-  font-family: 'Cormorant SC', serif;
-  text-transform: uppercase;
-}
-
-h1.mainHeader {
-  margin: 5px;
-  font-weight: bold;
-}
+@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
 
 .mainWordmark {
-  width: 200px;
-  margin-top: 20px;
+  font-family: Quicksand, serif;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 40px;
+  font-weight: normal;
 }
 
 h4.mainHeader {
+  font-family: 'Cormorant SC', serif;
+  text-transform: uppercase;
   margin-top: 0;
   margin-bottom: 20px;
   font-weight: 400;
@@ -208,8 +204,13 @@ html, input, textarea, button {
 }
 
 @media (max-width: ${(MEDIA_WIDTHS as any)['upToSmall']}px) {
-  .mainWordmark, .mainHeader {
-    // display: none
+  .mainWordmark {
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+
+  .mainHeader {
+    display: none
   }
 }
 
