@@ -34,11 +34,10 @@ export default function AppBody({ children, disabled }: { children: React.ReactN
   const [highlight, setHighlight] = useState<boolean>(false);
 
   return <HeadersPlusBodyWrapper>
-    <UnicornSvg mobile={true} />
     <div onMouseEnter={() => setHighlight(true)} onMouseLeave={() => setHighlight(false)}>
       <Logo/>
-      <img className="mainWordmark" src={isDark ? WhiteWordmark : BlackWordmark} alt="logo" />
-      <h4 className="mainHeader">Next generation AMM protocol by 1inch</h4>
+      <h1 className="mainWordmark">Mooniswap</h1>
+      <h4 className="mainHeader">Next generation AMM protocol by 1inch team</h4>
     </div>
     <UnicornSvg highlight={highlight} />
     <UnicornSvg highlight={highlight} flip={true} />
