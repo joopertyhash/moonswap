@@ -381,7 +381,13 @@ export default function WalletModal({
                   setTermAndConditionsAccepted(event.target.checked)
                 }}/>
               <span>
-                <b>I accept <a href="https://1inch.exchange/assets/terms-of-service-and-legal-disclosure.pdf" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</b>
+                <b>I accept
+                  {'  '}<a href={process.env.PUBLIC_URL + '/docs/Mooniswap_Terms_of_Use.pdf'}
+                     target="_blank" rel="noopener noreferrer">Terms of Use</a>{'  '}
+                  and
+                  {'  '}<a href={process.env.PUBLIC_URL + '/docs/Mooniswap_Privacy_Policy.pdf'}
+                     target="_blank" rel="noopener noreferrer">Privacy Policy</a>.{'  '}
+                </b>
             </span>
             </label>
           </TermsRow>
