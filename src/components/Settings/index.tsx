@@ -20,6 +20,7 @@ import { useSettingsMenuOpen, useToggleSettingsMenu } from '../../state/applicat
 import { Text } from 'rebass'
 import Modal from '../Modal'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
+import Option from '../WalletModal/Option'
 
 const StyledMenuIcon = styled(Settings)`
   height: 20px;
@@ -84,6 +85,15 @@ const StyledMenu = styled.div`
   text-align: left;
 `
 
+const OptionGrid = styled.div`
+  display: grid;
+  grid-gap: 10px;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    grid-template-columns: 1fr;
+    grid-gap: 10px;
+  `};
+`
+
 const MenuFlyout = styled.span`
   min-width: 20.125rem;
   background-color: ${({ theme }) => theme.bg1};
@@ -124,7 +134,8 @@ const ModalContentWrapper = styled.div`
 
 const DropDownIcon = styled(DropDown)<{ selected: boolean }>`
   margin: 0 0.25rem 0.1rem 0.25rem;
-  height: 35%;
+  width: 10px;
+  height: 17px;
 
   path {
     stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
@@ -146,15 +157,65 @@ const langNameMap = {
   'zh-TW': 'Chinese (Taiwan)',
 };
 
-function LanguageSelect() {
+function LanguageSelect({handleClick}: {handleClick: () => void}) {
   const langCode = window.localStorage.getItem('i18nextLng')
+  const theme = useContext(ThemeContext)
+
   return (
-    <span style={{ cursor: 'pointer' }}>
+    <span style={{
+      cursor: 'pointer',
+      fontSize: 14,
+      color: theme.text2,
+      display: 'flex',
+      borderRadius: 16,
+      border: `1px solid ${theme.text4}`,
+      padding: '0.25rem 0.5rem'
+    }} onClick={handleClick}>
       {langNameMap[langCode] || 'English'}
       <DropDownIcon selected={true}></DropDownIcon>
     </span>
   );
 }
+
+function getLangOptions() {
+    const langList = [
+      {code: 'en', color: '#315CF5', iconName: 'en.svg' },
+      {code: 'de', color: '#315CF5', iconName: 'de.svg' },
+      {code: 'es-AR', color: '#315CF5', iconName: 'es-AR.svg' },
+      {code: 'es-US', color: '#315CF5', iconName: 'es-US.svg' },
+      {code: 'it-IT', color: '#315CF5', iconName: 'it-IT.svg' },
+      {code: 'iw', color: '#315CF5', iconName: 'iw.svg' },
+      {code: 'ro', color: '#315CF5', iconName: 'ro.svg' },
+      {code: 'ru', color: '#315CF5', iconName: 'ru.svg' },
+      {code: 'vi', color: '#315CF5', iconName: 'vi.svg' },
+      {code: 'zh-CN', color: '#315CF5', iconName: 'zh-CN.svg' },
+      {code: 'zh-TW', color: '#315CF5', iconName: 'zh-TW.svg' },
+    ];
+
+  const selectedLangCode = window.localStorage.getItem('i18nextLng');
+
+  return langList.map(option => {
+
+    return (
+      <Option
+        id={`connect-${option.code}`}
+        onClick={() => {
+          window.localStorage.setItem('i18nextLng', option.code)
+          window.location.reload();
+        }}
+        key={option.code}
+        active={option.code === selectedLangCode}
+        color={option.color}
+        // link={option.href}
+        header={langNameMap[option.code]}
+        subheader={null} //use option.descriptio to bring back multi-line
+        icon={require('../../assets/flags/' + option.iconName)}
+      />
+    )
+  })
+
+}
+
 
 export default function SettingsTab() {
   const node = useRef<HTMLDivElement>()
@@ -172,6 +233,8 @@ export default function SettingsTab() {
 
   // show confirmation view before turning on
   const [showConfirmation, setShowConfirmation] = useState(false)
+
+  const [showLangDialog, setShowLangDialog] = useState(false)
 
   useEffect(() => {
     const handleClickOutside = e => {
@@ -192,8 +255,32 @@ export default function SettingsTab() {
     }
   }, [open, toggle])
 
+
   return (
     <StyledMenu ref={node}>
+
+      <Modal isOpen={showLangDialog} onDismiss={() => setShowLangDialog(false)} maxHeight={80}>
+        <ModalContentWrapper style={{width: '100%'}}>
+          <AutoColumn gap="lg" style={{width: '100%'}}>
+            <RowBetween style={{ padding: '0 2rem' }}>
+              <div />
+              <Text fontWeight={500} fontSize={20}>
+                Select Language
+              </Text>
+              <StyledCloseIcon onClick={() => setShowLangDialog(false)} />
+            </RowBetween>
+            <Break />
+            <div style={{overflow: 'auto', height: 500}}>
+              <AutoColumn gap="lg" style={{ padding: '0 2rem'}}>
+                  <OptionGrid>
+                    {getLangOptions()}
+                  </OptionGrid>
+              </AutoColumn>
+            </div>
+          </AutoColumn>
+        </ModalContentWrapper>
+      </Modal>
+
       <Modal isOpen={showConfirmation} onDismiss={() => setShowConfirmation(false)} maxHeight={100}>
         <ModalContentWrapper>
           <AutoColumn gap="lg">
@@ -292,7 +379,7 @@ export default function SettingsTab() {
                   Language
                 </TYPE.black>
               </RowFixed>
-              <LanguageSelect></LanguageSelect>
+              <LanguageSelect handleClick={() => setShowLangDialog(true)}></LanguageSelect>
             </RowBetween>
           </AutoColumn>
         </MenuFlyout>
