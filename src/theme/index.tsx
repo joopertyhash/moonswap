@@ -172,30 +172,12 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
-
 .onlyDesktop {
   display: block;
 }
 
 .onlyMobile {
   display: none;
-}
-
-.mainWordmark {
-  font-family: Quicksand, serif;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 40px;
-  font-weight: normal;
-}
-
-h4.mainHeader {
-  font-family: Quicksand, serif;
-  text-transform: uppercase;
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-weight: 400;
 }
 
 html, input, textarea, button {
@@ -217,26 +199,6 @@ html, input, textarea, button {
   
   .onlyMobile {
     display: block;
-  }
-
-  .mainWordmark {
-    margin-top: 0;
-    margin-bottom: 0;
-    text-align: left;
-    font-size: 24px;
-  }
-
-  h4.mainHeader {
-    font-family: Quicksand, serif;
-    text-align: left;
-    margin-bottom: 0;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: ${(MEDIA_WIDTHS as any)['upToTheSmallest']}px) {
-  h4.mainHeader {
-    font-size: 10px;
   }
 }
 

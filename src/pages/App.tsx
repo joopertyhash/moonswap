@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom'
+import Wordmark from '../components/Wordmark'
 import Logo from '../components/Logo'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
@@ -72,9 +73,8 @@ export default function App() {
         <Route component={DarkModeQueryParamReader} />
         <AppWrapper>
           <LogoWrapper>
-            <Logo mobile={true}/>
-            <h1 className="mainWordmark">Mooniswap</h1>
-            <h4 className="mainHeader">Next generation AMM protocol by 1inch</h4>
+            <Logo mobile={true} />
+            <Wordmark mobile={true} />
           </LogoWrapper>
           <HeaderWrapper>
             <Header />
