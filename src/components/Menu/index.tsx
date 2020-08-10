@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 // import { Info, BookOpen, Code, PieChart, MessageCircle } from 'react-feather'
-import { BookOpen, Code, MessageCircle } from 'react-feather'
+import { BookOpen, Code, Info, MessageCircle } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import useToggle from '../../hooks/useToggle'
@@ -110,10 +110,10 @@ export default function Menu() {
       </StyledMenuButton>
       {open && (
         <MenuFlyout>
-          {/*<MenuItem id="link" href="https://uniswap.org/">*/}
-          {/*  <Info size={14} />*/}
-          {/*  About*/}
-          {/*</MenuItem>*/}
+          <MenuItem id="link" href="https://medium.com/@1inch.exchange/1inch-revolutionizes-automated-market-maker-amm-segment-with-mooniswap-e068c20d94c">
+            <Info size={14} />
+            About
+          </MenuItem>
           {/*<MenuItem id="link" href="https://uniswap.org/docs/v2">*/}
           {/*  <BookOpen size={14} />*/}
           {/*  Docs*/}
