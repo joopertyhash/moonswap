@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ETHER, Token, TokenAmount } from '@uniswap/sdk'
+import { ETHER, JSBI, Token, TokenAmount } from '@uniswap/sdk'
 import React, { useCallback, useContext, useState } from 'react'
 import { Plus } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -177,9 +177,10 @@ export default function AddLiquidity({
 
     const estimate = mooniswap.estimateGas.deposit
     const method = mooniswap.deposit
+    const amounts = [parsedAmountA, parsedAmountB]
     const args = [
-      [parsedAmountA.raw.toString(), parsedAmountB.raw.toString()],
-      calculateSlippageAmount(liquidityMinted, noLiquidity ? 0 : allowedSlippage)[0].toString()
+      amounts.map((x) => x.raw.toString()),
+      amounts.map((x) => JSBI.subtract(x.raw, calculateSlippageAmount(x, allowedSlippage)[0]).toString())
     ]
 
     if (currencyA === ETHER || currencyB === ETHER) {

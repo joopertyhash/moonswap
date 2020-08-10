@@ -2,6 +2,11 @@
   {
     "inputs": [
       {
+        "internalType": "contract IERC20[]",
+        "name": "assets",
+        "type": "address[]"
+      },
+      {
         "internalType": "string",
         "name": "name",
         "type": "string"
@@ -108,19 +113,25 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "srcPreBalance",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "dstPreBalance",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "result",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "srcBalance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "dstBalance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalSupply",
         "type": "uint256"
       },
       {
@@ -180,6 +191,19 @@
   {
     "inputs": [],
     "name": "BASE_SUPPLY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "FEE_DENOMINATOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -328,9 +352,9 @@
         "type": "uint256[]"
       },
       {
-        "internalType": "uint256",
-        "name": "minReturn",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "minAmounts",
+        "type": "uint256[]"
       }
     ],
     "name": "deposit",
@@ -342,6 +366,32 @@
       }
     ],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
+      {
+        "internalType": "contract IFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -406,6 +456,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTokens",
+    "outputs": [
+      {
+        "internalType": "contract IERC20[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -501,19 +564,6 @@
       }
     ],
     "name": "rescueFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IERC20[]",
-        "name": "assets",
-        "type": "address[]"
-      }
-    ],
-    "name": "setup",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -711,6 +761,30 @@
         "internalType": "uint40",
         "name": "time",
         "type": "uint40"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "volumes",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "confirmed",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "result",
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
