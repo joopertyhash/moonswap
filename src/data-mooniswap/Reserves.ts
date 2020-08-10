@@ -2,7 +2,7 @@ import { Pair, Token, TokenAmount } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from '../hooks'
 
-import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
+import { useSingleContractMultipleData } from '../state/multicall/hooks'
 import { useMooniswapV1HelperContract } from '../hooks/useContract'
 // @ts-ignore
 import { V1_MOONISWAP_FACTORY_ADDRESSES } from '../constants/v1-mooniswap'
@@ -33,20 +33,29 @@ export function usePairs(currencies: [Token | undefined, Token | undefined][]): 
     tokenBList.push(tokenB.address)
   }
 
-  const res = useSingleCallResult(useMooniswapV1HelperContract(), 'getPoolDataList', [
-    V1_MOONISWAP_FACTORY_ADDRESSES[chainId || 1],
-    tokenAList,
-    tokenBList
-  ], NEVER_RELOAD)
+  const pairsPerReq = 50;
+  const batches = Math.ceil(tokenAList.length / pairsPerReq);
+  const callDataList = [];
+  for (let i = 0; i < batches; i++) {
+    const inputs = [
+      V1_MOONISWAP_FACTORY_ADDRESSES[chainId || 1],
+      tokenAList.splice(0, pairsPerReq),
+      tokenBList.splice(0, pairsPerReq)
+    ]
+    callDataList.push(inputs)
+  }
+
+  const res = useSingleContractMultipleData(useMooniswapV1HelperContract(), 'getPoolDataList', callDataList);
 
   return useMemo(() => {
-    if (res.loading) return [[PairState.LOADING, null]]
+    // if (res.findIndex((x) => x.loading) !== -1) return [[PairState.LOADING, null]]
 
-    const poolDataList = res.result?.[0]
+    const poolDataList = res.map((x) => x.result?.[0])?.flat() || [];
     let counter = 0
 
     const pairStates: [PairState, Pair | null][] = []
-    for (let i = 0; i < allTokenAList.length; i++) {
+    for (let i = 0; i < poolDataList.length; i++) {
+
 
       const tokenA = allTokenAList[i]
       const tokenB = allTokenBList[i]
@@ -77,7 +86,7 @@ export function usePairs(currencies: [Token | undefined, Token | undefined][]): 
         )
       ])
     }
-    return pairStates
+    return pairStates.length !== 0 ? pairStates : [[PairState.LOADING, null]]
   }, [res, allTokenAList, allTokenBList])
 }
 

@@ -10,10 +10,12 @@ import { AppState } from '../index'
  */
 export class WrappedTokenInfo extends Token {
   public readonly tokenInfo: TokenInfo
+
   constructor(tokenInfo: TokenInfo) {
     super(tokenInfo.chainId, tokenInfo.address, tokenInfo.decimals, tokenInfo.symbol, tokenInfo.name)
     this.tokenInfo = tokenInfo
   }
+
   public get logoURI(): string | undefined {
     return this.tokenInfo.logoURI
   }
@@ -43,6 +45,9 @@ export function listToTokenMap(list: TokenList): TokenAddressMap {
     (tokenMap, tokenInfo) => {
       const token = new WrappedTokenInfo(tokenInfo)
       if (tokenMap[token.chainId][token.address] !== undefined) throw Error('Duplicate tokens.')
+      if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+        return { ...tokenMap }
+      }
       return {
         ...tokenMap,
         [token.chainId]: {

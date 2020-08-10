@@ -1,4 +1,4 @@
-import { Token, TokenAmount, ETHER, JSBI, Pair, Percent, Price } from '@uniswap/sdk'
+import { Token, TokenAmount, JSBI, Pair, Percent, Price } from '@uniswap/sdk'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { PairState, usePair } from '../../data-mooniswap/Reserves'
@@ -37,6 +37,8 @@ export function useDerivedMintInfo(currencyA: Token | undefined, currencyB: Toke
   const { independentField, typedValue, otherTypedValue } = useMintState()
 
   const dependentField = independentField === Field.CURRENCY_A ? Field.CURRENCY_B : Field.CURRENCY_A
+
+  const isFirstCurrencyA = currencyA && currencyB && currencyA.sortsBefore(currencyB);
 
   // tokens
   const currencies: { [field in Field]?: Token } = useMemo(
@@ -77,12 +79,11 @@ export function useDerivedMintInfo(currencyA: Token | undefined, currencyB: Toke
       const wrappedIndependentAmount = wrappedCurrencyAmount(independentAmount, chainId)
       const [tokenA, tokenB] = [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
       if (tokenA && tokenB && wrappedIndependentAmount && pair) {
-        const dependentCurrency = dependentField === Field.CURRENCY_B ? currencyB : currencyA
         const dependentTokenAmount =
           dependentField === Field.CURRENCY_B
             ? pair.priceOf(tokenA).quote(wrappedIndependentAmount)
             : pair.priceOf(tokenB).quote(wrappedIndependentAmount)
-        return dependentCurrency === ETHER ? new TokenAmount(ETHER, dependentTokenAmount.raw) : dependentTokenAmount
+        return dependentTokenAmount
       }
       return
     } else {
@@ -111,11 +112,15 @@ export function useDerivedMintInfo(currencyA: Token | undefined, currencyB: Toke
       wrappedCurrencyAmount(currencyBAmount, chainId)
     ]
     if (pair && totalSupply && tokenAmountA && tokenAmountB) {
-      return pair.getLiquidityMinted(totalSupply, tokenAmountA, tokenAmountB)
+      return pair.getLiquidityMinted(
+        totalSupply,
+        isFirstCurrencyA ? tokenAmountA : tokenAmountB,
+        isFirstCurrencyA ? tokenAmountB : tokenAmountA
+      )
     } else {
       return
     }
-  }, [parsedAmounts, chainId, pair, totalSupply])
+  }, [parsedAmounts, chainId, pair, totalSupply, isFirstCurrencyA])
 
   const poolTokenPercentage = useMemo(() => {
     if (liquidityMinted && totalSupply) {
