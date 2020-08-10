@@ -3,7 +3,14 @@ import { MEDIA_WIDTHS } from '../../theme'
 import styled from 'styled-components'
 
 const WordmarkStyled = styled.div`
-  @import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(https://fonts.gstatic.com/s/quicksand/v21/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkP8o58a-xDwxUD2GFw.woff) format('woff');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
 
   color: ${({ theme }) => theme.text1};
 
