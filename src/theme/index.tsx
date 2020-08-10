@@ -180,12 +180,6 @@ export const FixedGlobalStyle = createGlobalStyle`
   display: none;
 }
 
-.mainWordmark {
-  width: 360px;
-  display: block;
-  margin: 10px auto 20px;
-}
-
 html, input, textarea, button {
   font-family: 'Inter', sans-serif;
   letter-spacing: -0.018em;
@@ -205,20 +199,6 @@ html, input, textarea, button {
   
   .onlyMobile {
     display: block;
-  }
-
-  .mainWordmark {
-    margin-top: 7px;
-    margin-bottom: 7px;
-    width: 260px;
-  }
-}
-
-@media (max-width: ${(MEDIA_WIDTHS as any)['upToTheSmallest']}px) {
-  .mainWordmark {
-    margin-top: 10px;
-    margin-bottom: 9px;
-    width: 220px;
   }
 }
 

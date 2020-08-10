@@ -1,11 +1,8 @@
 import React, {useState} from 'react'
-import { useDarkModeManager } from '../state/user/hooks'
-// import {useDarkModeManager} from "../state/user/hooks";
+import Wordmark from '../components/Wordmark'
 import Logo from "../components/Logo";
 import styled from 'styled-components'
 import UnicornSvg from '../components/UnicornSvg'
-import WhiteWordmark from '../assets/svg/wordmark_white.svg'
-import BlackWordmark from '../assets/svg/wordmark.svg'
 
 export const HeadersPlusBodyWrapper = styled.div<{ disabled?: boolean }>`
   position: relative;
@@ -31,16 +28,12 @@ export const BodyWrapper = styled.div<{ disabled?: boolean }>`
  * The styled container element that wraps the content of most pages and the tabs.
  */
 export default function AppBody({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
-  const [isDark] = useDarkModeManager();
   const [highlight, setHighlight] = useState<boolean>(false);
 
   return <HeadersPlusBodyWrapper>
     <div className="onlyDesktop" onMouseEnter={() => setHighlight(true)} onMouseLeave={() => setHighlight(false)}>
       <Logo/>
-      {isDark
-        ? <img className="mainWordmark" src={WhiteWordmark} alt="" />
-        : <img className="mainWordmark" src={BlackWordmark} alt="" />
-      }
+      <Wordmark />
     </div>
     <UnicornSvg highlight={highlight} />
     <UnicornSvg highlight={highlight} flip={true} />

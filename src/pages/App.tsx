@@ -1,8 +1,6 @@
 import React, { Suspense } from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom'
-import BlackWordmark from '../assets/svg/mobile_wordmark.svg'
-import WhiteWordmark from '../assets/svg/mobile_wordmark_white.svg'
-import { useDarkModeManager } from '../state/user/hooks'
+import Wordmark from '../components/Wordmark'
 import Logo from '../components/Logo'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
@@ -68,8 +66,6 @@ const BodyWrapper = styled.div`
 `
 
 export default function App() {
-  const [isDark] = useDarkModeManager();
-
   return (
     <Suspense fallback={null}>
       <HashRouter>
@@ -77,11 +73,8 @@ export default function App() {
         <Route component={DarkModeQueryParamReader} />
         <AppWrapper>
           <LogoWrapper>
-            <Logo mobile={true}/>
-            {isDark
-              ? <img className="mainWordmark" src={WhiteWordmark} alt="" />
-              : <img className="mainWordmark" src={BlackWordmark} alt="" />
-            }
+            <Logo mobile={true} />
+            <Wordmark mobile={true} />
           </LogoWrapper>
           <HeaderWrapper>
             <Header />

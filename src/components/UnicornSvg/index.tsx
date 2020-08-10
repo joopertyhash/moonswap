@@ -27,7 +27,7 @@ const StyledSVG = styled.svg<{ size: string; stroke?: string, flip?: boolean , h
         }
       }
     }`
-} 
+  } 
   
   ${({highlight}) => highlight && `
       opacity: 1; transition: .5s;
