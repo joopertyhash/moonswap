@@ -172,8 +172,6 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
-
 .onlyDesktop {
   display: block;
 }
@@ -183,19 +181,9 @@ export const FixedGlobalStyle = createGlobalStyle`
 }
 
 .mainWordmark {
-  font-family: Quicksand, serif;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 40px;
-  font-weight: normal;
-}
-
-h4.mainHeader {
-  font-family: Quicksand, serif;
-  text-transform: uppercase;
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-weight: 400;
+  width: 360px;
+  display: block;
+  margin: 10px auto 20px;
 }
 
 html, input, textarea, button {
@@ -220,23 +208,17 @@ html, input, textarea, button {
   }
 
   .mainWordmark {
-    margin-top: 0;
-    margin-bottom: 0;
-    text-align: left;
-    font-size: 24px;
-  }
-
-  h4.mainHeader {
-    font-family: Quicksand, serif;
-    text-align: left;
-    margin-bottom: 0;
-    font-size: 12px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    width: 260px;
   }
 }
 
 @media (max-width: ${(MEDIA_WIDTHS as any)['upToTheSmallest']}px) {
-  h4.mainHeader {
-    font-size: 10px;
+  .mainWordmark {
+    margin-top: 10px;
+    margin-bottom: 9px;
+    width: 220px;
   }
 }
 
