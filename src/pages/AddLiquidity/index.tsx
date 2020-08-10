@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ETHER, JSBI, Token, TokenAmount } from '@uniswap/sdk'
+import { ETHER, JSBI, Token, TokenAmount, ZERO_ADDRESS } from '@uniswap/sdk'
 import React, { useCallback, useContext, useState } from 'react'
 import { Plus } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -313,7 +313,7 @@ export default function AddLiquidity({
           history.push(`/add/${newCurrencyIdB}`)
         }
       } else {
-        history.push(`/add/${currencyIdA ? currencyIdA : 'ETH'}/${newCurrencyIdB}`)
+        history.push(`/add/${currencyIdA ? currencyIdA : ZERO_ADDRESS}/${newCurrencyIdB}`)
       }
     },
     [currencyIdA, history, currencyIdB]

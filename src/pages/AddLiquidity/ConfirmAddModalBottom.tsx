@@ -59,7 +59,8 @@ export function ConfirmAddModalBottom({
       </RowBetween>
       <ButtonPrimary style={{ margin: '20px 0 0 0' }} onClick={onAdd}>
         <Text fontWeight={500} fontSize={20}>
-          {noLiquidity ? 'Create Pool & Supply' : 'Confirm Supply'}
+          {/*{noLiquidity ? 'Create Pool & Supply' : 'Confirm Supply'}*/}
+          {'Confirm Supply'}
         </Text>
       </ButtonPrimary>
     </>
