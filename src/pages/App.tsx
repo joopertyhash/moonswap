@@ -51,7 +51,7 @@ const BodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-top: 70px;
+  padding-top: 30px;
   align-items: center;
   flex: 1;
   overflow-y: auto;
@@ -74,7 +74,7 @@ export default function App() {
         <AppWrapper>
           <LogoWrapper>
             <Logo mobile={true} />
-            <Wordmark mobile={true} />
+            <Wordmark />
           </LogoWrapper>
           <HeaderWrapper>
             <Header />
