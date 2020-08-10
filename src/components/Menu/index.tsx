@@ -49,7 +49,7 @@ const StyledMenu = styled.div`
 `
 
 const MenuFlyout = styled.span`
-  min-width: 8.125rem;
+  min-width: 9.125rem;
   background-color: ${({ theme }) => theme.bg3};
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
@@ -110,9 +110,6 @@ export default function Menu() {
       </StyledMenuButton>
       {open && (
         <MenuFlyout>
-          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/MooniswapWhitePaper-v1.0.pdf'}>
-            Whitepaper
-          </MenuItem>
           <MenuItem id="link" href="https://medium.com/@1inch.exchange/1inch-revolutionizes-automated-market-maker-amm-segment-with-mooniswap-e068c20d94c">
             <Info size={14} />
             About
@@ -124,6 +121,10 @@ export default function Menu() {
           <MenuItem id="link" href="https://discord.gg/FZADkCZ">
             <MessageCircle size={14} />
             Discord
+          </MenuItem>
+          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/MooniswapWhitePaper-v1.0.pdf'}>
+            <BookOpen size={14} />
+            Whitepaper
           </MenuItem>
           <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/mooniswap-audit-report.pdf'}>
             <BookOpen size={14} />
