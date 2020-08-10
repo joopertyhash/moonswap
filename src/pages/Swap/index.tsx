@@ -145,13 +145,13 @@ export default function Swap() {
     }
   }, [approval, approvalSubmitted])
 
+  // the callback to execute the swap
+  const swapCallback = useSwapCallback(parsedAmount, trade, distribution, allowedSlippage)
+
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   const slippageAdjustedAmounts = computeSlippageAdjustedAmounts(trade, allowedSlippage)
-
-  // the callback to execute the swap
-  const swapCallback = useSwapCallback(parsedAmount, trade, distribution, allowedSlippage)
 
   const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade)
 
