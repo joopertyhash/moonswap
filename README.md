@@ -8,7 +8,7 @@ Mooniswap is next generation AMM (Automated Market Maker) protocol.
 This repository contains Mooniswap Interface originally forked from Uniswap.
 
 ## Accessing the Mooniswap Interface
-To access the Uniswap Interface, use an IPFS gateway link from the
+To access the Mooniswap Interface, use an IPFS gateway link from the
 [latest release](https://github.com/CryptoManiacsZone/mooniswap-interface/releases/latest), 
 or visit [mooniswap.exchange](https://mooniswap.exchange/).
 
