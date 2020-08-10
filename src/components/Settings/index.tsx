@@ -134,7 +134,8 @@ const ModalContentWrapper = styled.div`
 
 const DropDownIcon = styled(DropDown)<{ selected: boolean }>`
   margin: 0 0.25rem 0.1rem 0.25rem;
-  height: 35%;
+  width: 10px;
+  height: 17px;
 
   path {
     stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
@@ -158,8 +159,18 @@ const langNameMap = {
 
 function LanguageSelect({handleClick}: {handleClick: () => void}) {
   const langCode = window.localStorage.getItem('i18nextLng')
+  const theme = useContext(ThemeContext)
+
   return (
-    <span style={{ cursor: 'pointer' }} onClick={handleClick}>
+    <span style={{
+      cursor: 'pointer',
+      fontSize: 14,
+      color: theme.text2,
+      display: 'flex',
+      borderRadius: 16,
+      border: `1px solid ${theme.text4}`,
+      padding: '0.25rem 0.5rem'
+    }} onClick={handleClick}>
       {langNameMap[langCode] || 'English'}
       <DropDownIcon selected={true}></DropDownIcon>
     </span>
@@ -259,11 +270,13 @@ export default function SettingsTab() {
               <StyledCloseIcon onClick={() => setShowLangDialog(false)} />
             </RowBetween>
             <Break />
-            <AutoColumn gap="lg" style={{ padding: '0 2rem' }}>
-              <OptionGrid>
-                {getLangOptions()}
-              </OptionGrid>
-            </AutoColumn>
+            <div style={{overflow: 'auto', height: 500}}>
+              <AutoColumn gap="lg" style={{ padding: '0 2rem'}}>
+                  <OptionGrid>
+                    {getLangOptions()}
+                  </OptionGrid>
+              </AutoColumn>
+            </div>
           </AutoColumn>
         </ModalContentWrapper>
       </Modal>
