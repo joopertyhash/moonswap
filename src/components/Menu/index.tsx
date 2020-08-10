@@ -78,7 +78,7 @@ const MenuItem = styled(ExternalLink)`
   }
 `
 
-const CODE_LINK = 'https://github.com/CryptoManiacsZone/mooniswap-interface'
+const CODE_LINK = 'https://github.com/CryptoManiacsZone/mooniswap'
 
 export default function Menu() {
   const node = useRef<HTMLDivElement>()
