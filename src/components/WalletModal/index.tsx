@@ -17,6 +17,7 @@ import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { injected, fortmatic, portis } from '../../connectors'
 import { OVERLAY_READY } from '../../connectors/Fortmatic'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -107,6 +108,19 @@ const HoverText = styled.div`
   }
 `
 
+const TermsRow = styled.div`
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+`
+
+const WarningRow = styled.div`
+  margin-bottom: 15px;
+  color: ${({ theme }) => theme.red1};
+  display: flex;
+  justify-content: center;
+`
+
 const WALLET_VIEWS = {
   OPTIONS: 'options',
   OPTIONS_SECONDARY: 'options_secondary',
@@ -115,10 +129,10 @@ const WALLET_VIEWS = {
 }
 
 export default function WalletModal({
-  pendingTransactions,
-  confirmedTransactions,
-  ENSName
-}: {
+                                      pendingTransactions,
+                                      confirmedTransactions,
+                                      ENSName
+                                    }: {
   pendingTransactions: string[] // hashes of pending
   confirmedTransactions: string[] // hashes of confirmed
   ENSName?: string
@@ -199,8 +213,16 @@ export default function WalletModal({
     })
   }, [toggleWalletModal])
 
+  const [termAndConditionsAccepted, setTermAndConditionsAccepted]
+    = useLocalStorage('termAndConditionsAccepted', false)
+
+  console.log('termAndConditionsAccepted=', termAndConditionsAccepted);
+
+  const [warning, setWarning] = useState(false);
+
   // get wallets user can switch too, depending on device/browser
-  function getOptions() {
+  function getOptions(isAccepted: boolean) {
+
     const isMetamask = window.ethereum && window.ethereum.isMetaMask
     return Object.keys(SUPPORTED_WALLETS).map(key => {
       const option = SUPPORTED_WALLETS[key]
@@ -215,6 +237,10 @@ export default function WalletModal({
           return (
             <Option
               onClick={() => {
+                if (isAccepted !== true) {
+                  setWarning(true)
+                  return
+                }
                 option.connector !== connector && !option.href && tryActivation(option.connector)
               }}
               id={`connect-${key}`}
@@ -268,6 +294,12 @@ export default function WalletModal({
           <Option
             id={`connect-${key}`}
             onClick={() => {
+
+              if (termAndConditionsAccepted !== true) {
+                setWarning(true)
+                return
+              }
+
               option.connector === connector
                 ? setWalletView(WALLET_VIEWS.ACCOUNT)
                 : !option.href && tryActivation(option.connector)
@@ -285,12 +317,13 @@ export default function WalletModal({
     })
   }
 
-  function getModalContent() {
+  function getModalContent(): {} {
+
     if (error) {
       return (
         <UpperSection>
           <CloseIcon onClick={toggleWalletModal}>
-            <CloseColor />
+            <CloseColor/>
           </CloseIcon>
           <HeaderRow>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error connecting'}</HeaderRow>
           <ContentWrapper>
@@ -317,7 +350,7 @@ export default function WalletModal({
     return (
       <UpperSection>
         <CloseIcon onClick={toggleWalletModal}>
-          <CloseColor />
+          <CloseColor/>
         </CloseIcon>
         {walletView !== WALLET_VIEWS.ACCOUNT ? (
           <HeaderRow color="blue">
@@ -336,6 +369,26 @@ export default function WalletModal({
           </HeaderRow>
         )}
         <ContentWrapper>
+
+          <TermsRow>
+            <label>
+              <input
+                name="isGoing"
+                type="checkbox"
+                checked={termAndConditionsAccepted}
+                onChange={(event) => {
+                  if(event.target.checked) {
+                    setWarning(false)
+                  }
+                  setTermAndConditionsAccepted(event.target.checked)
+                }}/>
+              <span>
+                <b>I accept <a href="https://1inch.exchange/assets/terms-of-service-and-legal-disclosure.pdf" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</b>
+            </span>
+            </label>
+          </TermsRow>
+          {warning ? <WarningRow>Please accept terms and conditions first</WarningRow> : ''}
+
           {walletView === WALLET_VIEWS.PENDING ? (
             <PendingView
               connector={pendingWallet}
@@ -344,10 +397,11 @@ export default function WalletModal({
               tryActivation={tryActivation}
             />
           ) : (
-            <OptionGrid>{getOptions()}</OptionGrid>
+            <OptionGrid>{getOptions(termAndConditionsAccepted)}</OptionGrid>
           )}
           {walletView !== WALLET_VIEWS.PENDING && (
             <Blurb>
+
               <span>New to Ethereum? &nbsp;</span>{' '}
               <ExternalLink href="https://ethereum.org/use/#3-what-is-a-wallet-and-which-one-should-i-use">
                 Learn more about wallets

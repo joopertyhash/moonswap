@@ -110,7 +110,9 @@ export default function Option({
   active?: boolean
   id: string
 }) {
+
   const content = (
+    <div>
     <OptionCardClickable id={id} onClick={onClick} clickable={clickable && !active} active={active}>
       <OptionCardLeft>
         <HeaderText color={color}>
@@ -130,7 +132,9 @@ export default function Option({
       <IconWrapper size={size}>
         <img src={icon} alt={'Icon'} />
       </IconWrapper>
+
     </OptionCardClickable>
+    </div>
   )
   if (link) {
     return <ExternalLink href={link}>{content}</ExternalLink>
