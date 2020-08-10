@@ -216,8 +216,6 @@ export default function WalletModal({
   const [termAndConditionsAccepted, setTermAndConditionsAccepted]
     = useLocalStorage('termAndConditionsAccepted', false)
 
-  console.log('termAndConditionsAccepted=', termAndConditionsAccepted);
-
   const [warning, setWarning] = useState(false);
 
   // get wallets user can switch too, depending on device/browser
