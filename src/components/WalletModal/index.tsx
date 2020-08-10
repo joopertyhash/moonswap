@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactGA from 'react-ga'
+import DocLink from '../../components/DocLink'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
@@ -381,12 +382,10 @@ export default function WalletModal({
                   setTermAndConditionsAccepted(event.target.checked)
                 }}/>
               <span>
-                <b>I accept
-                  {'  '}<a href={process.env.PUBLIC_URL + '/docs/Mooniswap_Terms_of_Use.pdf'}
-                     target="_blank" rel="noopener noreferrer">Terms of Use</a>{'  '}
-                  and
-                  {'  '}<a href={process.env.PUBLIC_URL + '/docs/Mooniswap_Privacy_Policy.pdf'}
-                     target="_blank" rel="noopener noreferrer">Privacy Policy</a>.{'  '}
+                <b>I accept {'  '}
+                  <DocLink title="Terms of Use" href={process.env.PUBLIC_URL + '/docs/Mooniswap_Terms_of_Use.pdf'} />
+                  {'  '} and {'  '}
+                  <DocLink title="Privacy Policy" href={process.env.PUBLIC_URL + '/docs/Mooniswap_Privacy_Policy.pdf'} />
                 </b>
             </span>
             </label>
