@@ -16,6 +16,7 @@ import ListsUpdater from './state/lists/updater'
 import UserUpdater from './state/user/updater'
 import MulticallUpdater from './state/multicall/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
+import HttpsRedirect from './https-redirect'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -49,31 +50,33 @@ window.addEventListener('error', error => {
 function Updaters() {
   return (
     <>
-      <ListsUpdater />
-      <UserUpdater />
-      <ApplicationUpdater />
-      <TransactionUpdater />
-      <MulticallUpdater />
+      <ListsUpdater/>
+      <UserUpdater/>
+      <ApplicationUpdater/>
+      <TransactionUpdater/>
+      <MulticallUpdater/>
     </>
   )
 }
 
 ReactDOM.render(
   <>
-    <FixedGlobalStyle />
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3ProviderNetwork getLibrary={getLibrary}>
-        <Provider store={store}>
-          <Updaters />
-          <ThemeProvider>
-            <>
-              <ThemedGlobalStyle />
-              <App />
-            </>
-          </ThemeProvider>
-        </Provider>
-      </Web3ProviderNetwork>
-    </Web3ReactProvider>
+    <HttpsRedirect>
+      <FixedGlobalStyle/>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <Web3ProviderNetwork getLibrary={getLibrary}>
+          <Provider store={store}>
+            <Updaters/>
+            <ThemeProvider>
+              <>
+                <ThemedGlobalStyle/>
+                <App/>
+              </>
+            </ThemeProvider>
+          </Provider>
+        </Web3ProviderNetwork>
+      </Web3ReactProvider>
+    </HttpsRedirect>
   </>,
   document.getElementById('root')
 )
