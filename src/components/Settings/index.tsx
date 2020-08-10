@@ -19,6 +19,7 @@ import { ButtonError } from '../Button'
 import { useSettingsMenuOpen, useToggleSettingsMenu } from '../../state/application/hooks'
 import { Text } from 'rebass'
 import Modal from '../Modal'
+import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 
 const StyledMenuIcon = styled(Settings)`
   height: 20px;
@@ -120,6 +121,40 @@ const ModalContentWrapper = styled.div`
   background-color: ${({ theme }) => theme.bg2};
   border-radius: 20px;
 `
+
+const DropDownIcon = styled(DropDown)<{ selected: boolean }>`
+  margin: 0 0.25rem 0.1rem 0.25rem;
+  height: 35%;
+
+  path {
+    stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
+    stroke-width: 1.5px;
+  }
+`
+
+const langNameMap = {
+  'de': 'German',
+  'en': 'English',
+  'es-AR': 'Spanish (Argentina)',
+  'es-US': 'Spanish',
+  'it-IT': 'Italian',
+  'iw': 'Hebrew',
+  'ro': 'Romanian',
+  'ru': 'Russian',
+  'vi': 'Vietnamese',
+  'zh-CN': 'Chinese (PRC)',
+  'zh-TW': 'Chinese (Taiwan)',
+};
+
+function LanguageSelect() {
+  const langCode = window.localStorage.getItem('i18nextLng')
+  return (
+    <span style={{ cursor: 'pointer' }}>
+      {langNameMap[langCode] || 'English'}
+      <DropDownIcon selected={true}></DropDownIcon>
+    </span>
+  );
+}
 
 export default function SettingsTab() {
   const node = useRef<HTMLDivElement>()
@@ -250,6 +285,14 @@ export default function SettingsTab() {
                 </TYPE.black>
               </RowFixed>
               <Toggle isActive={darkMode} toggle={toggleDarkMode} />
+            </RowBetween>
+            <RowBetween>
+              <RowFixed>
+                <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
+                  Language
+                </TYPE.black>
+              </RowFixed>
+              <LanguageSelect></LanguageSelect>
             </RowBetween>
           </AutoColumn>
         </MenuFlyout>
