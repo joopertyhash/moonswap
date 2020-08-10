@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 // import { Info, BookOpen, Code, PieChart, MessageCircle } from 'react-feather'
-import { Code, MessageCircle } from 'react-feather'
+import { BookOpen, Code, MessageCircle } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import useToggle from '../../hooks/useToggle'
@@ -125,6 +125,10 @@ export default function Menu() {
           <MenuItem id="link" href="https://discord.gg/FZADkCZ">
             <MessageCircle size={14} />
             Discord
+          </MenuItem>
+          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/mooniswap-audit-report.pdf'}>
+            <BookOpen size={14} />
+            Audit
           </MenuItem>
           {/*<MenuItem id="link" href="https://uniswap.info/">*/}
           {/*  <PieChart size={14} />*/}
