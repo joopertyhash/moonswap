@@ -110,14 +110,13 @@ export default function Menu() {
       </StyledMenuButton>
       {open && (
         <MenuFlyout>
+          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/MooniswapWhitePaper-v1.0.pdf'}>
+            Whitepaper
+          </MenuItem>
           <MenuItem id="link" href="https://medium.com/@1inch.exchange/1inch-revolutionizes-automated-market-maker-amm-segment-with-mooniswap-e068c20d94c">
             <Info size={14} />
             About
           </MenuItem>
-          {/*<MenuItem id="link" href="https://uniswap.org/docs/v2">*/}
-          {/*  <BookOpen size={14} />*/}
-          {/*  Docs*/}
-          {/*</MenuItem>*/}
           <MenuItem id="link" href={CODE_LINK}>
             <Code size={14} />
             Code
