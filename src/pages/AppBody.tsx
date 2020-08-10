@@ -9,7 +9,6 @@ export const HeadersPlusBodyWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 420px;
   width: 100%;
   text-align: center;
-  margin-top: -40px;
 `
 
 export const BodyWrapper = styled.div<{ disabled?: boolean }>`
