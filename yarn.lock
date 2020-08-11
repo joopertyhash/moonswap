@@ -2670,7 +2670,7 @@
 
 "@uniswap/sdk@CryptoManiacsZone/mooniswap-sdk.git#v2":
   version "3.0.4"
-  resolved "https://codeload.github.com/CryptoManiacsZone/mooniswap-sdk/tar.gz/8cd4477999a5a48a6963e0169ecb149f958fb6d5"
+  resolved "https://codeload.github.com/CryptoManiacsZone/mooniswap-sdk/tar.gz/3de26bbb6cdf89e1b1dfb679aa371e3d0b22ce87"
   dependencies:
     "@ethersproject/address" "^5.0.1"
     "@ethersproject/contracts" "^5.0.1"
