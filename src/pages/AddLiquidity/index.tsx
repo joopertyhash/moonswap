@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ETHER, JSBI, Token, TokenAmount, ZERO_ADDRESS } from '@uniswap/sdk'
+import { ETHER, Token, TokenAmount, ZERO_ADDRESS } from '@uniswap/sdk'
 import React, { useCallback, useContext, useState } from 'react'
 import { Plus } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -180,7 +180,7 @@ export default function AddLiquidity({
     const amounts = pair.token0.equals(parsedAmountA.token) ? [parsedAmountA, parsedAmountB] : [parsedAmountB, parsedAmountA]
     const args = [
       amounts.map((x) => x.raw.toString()),
-      amounts.map((x) => JSBI.subtract(x.raw, calculateSlippageAmount(x, allowedSlippage)[0]).toString())
+      amounts.map((x) => calculateSlippageAmount(x, allowedSlippage)[0])
     ]
 
     if (currencyA === ETHER || currencyB === ETHER) {

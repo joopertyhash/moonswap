@@ -126,7 +126,7 @@ export default function Menu() {
             <BookOpen size={14} />
             Whitepaper
           </MenuItem>
-          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/mooniswap-audit-report.pdf'}>
+          <MenuItem id="link" href="https://dapp.org.uk/reports/mooniswap.html">
             <BookOpen size={14} />
             Audit
           </MenuItem>
