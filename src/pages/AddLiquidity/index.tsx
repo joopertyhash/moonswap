@@ -180,7 +180,7 @@ export default function AddLiquidity({
     const amounts = pair.token0.equals(parsedAmountA.token) ? [parsedAmountA, parsedAmountB] : [parsedAmountB, parsedAmountA]
     const args = [
       amounts.map((x) => x.raw.toString()),
-      amounts.map((x) => calculateSlippageAmount(x, allowedSlippage)[0])
+      amounts.map((x) => calculateSlippageAmount(x, allowedSlippage)[0].toString())
     ]
 
     if (currencyA === ETHER || currencyB === ETHER) {
