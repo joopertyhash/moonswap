@@ -157,4 +157,4 @@ export const BETTER_TRADE_LINK_THRESHOLD = new Percent(JSBI.BigInt(75), JSBI.Big
 
 // the Uniswap Default token list lives here
 export const DEFAULT_TOKEN_LIST_URL =
-  'https://gateway.ipfs.io/ipfs/QmVNGFWbvS63enYRigY1NyWDmuBvTmK98Yn94ZYtUL4uRA'
+  'https://gateway.ipfs.io/ipfs/Qmb6DCdjcyDwu8C2tgo4kN4yUTw6qch9x7Lj5UxRpKunnP'
