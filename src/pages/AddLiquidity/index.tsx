@@ -177,7 +177,7 @@ export default function AddLiquidity({
 
     const estimate = mooniswap.estimateGas.deposit
     const method = mooniswap.deposit
-    const amounts = [parsedAmountA, parsedAmountB]
+    const amounts = pair.token0.equals(parsedAmountA.token) ? [parsedAmountA, parsedAmountB] : [parsedAmountB, parsedAmountA]
     const args = [
       amounts.map((x) => x.raw.toString()),
       amounts.map((x) => JSBI.subtract(x.raw, calculateSlippageAmount(x, allowedSlippage)[0]).toString())
