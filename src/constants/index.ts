@@ -99,15 +99,15 @@ export const SUPPORTED_WALLETS =
             href: null,
             color: '#315CF5'
           },
-          // COINBASE_LINK: {
-          //   name: 'Open in Coinbase Wallet',
-          //   iconName: 'coinbaseWalletIcon.svg',
-          //   description: 'Open in Coinbase Wallet app.',
-          //   href: 'https://go.cb-w.com/mtUDhEZPy1',
-          //   color: '#315CF5',
-          //   mobile: true,
-          //   mobileOnly: true
-          // },
+          COINBASE_LINK: {
+            name: 'Open in Coinbase Wallet',
+            iconName: 'coinbaseWalletIcon.svg',
+            description: 'Open in Coinbase Wallet app.',
+            href: 'https://go.cb-w.com/dFdHIRRZS8',
+            color: '#315CF5',
+            mobile: true,
+            mobileOnly: true
+          },
           FORTMATIC: {
             connector: fortmatic,
             name: 'Fortmatic',
