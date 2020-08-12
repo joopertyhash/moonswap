@@ -130,6 +130,10 @@ export default function Menu() {
             <BookOpen size={14} />
             Audit
           </MenuItem>
+          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/mooniswap-audit-report-2.pdf'}>
+            <BookOpen size={14} />
+            Audit 2
+          </MenuItem>
           {/*<MenuItem id="link" href="https://uniswap.info/">*/}
           {/*  <PieChart size={14} />*/}
           {/*  Analytics*/}
