@@ -21,6 +21,7 @@ import { Text } from 'rebass'
 import Modal from '../Modal'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import Option from '../WalletModal/Option'
+import { ChiRow } from './ChiRow'
 
 const StyledMenuIcon = styled(Settings)`
   height: 20px;
@@ -340,17 +341,12 @@ export default function SettingsTab() {
               deadline={deadline}
               setDeadline={setDeadline}
             />
+
             <Text fontWeight={600} fontSize={14}>
               Gas Token
             </Text>
-            <RowBetween>
-              <RowFixed>
-                <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
-                  Activate CHI
-                </TYPE.black>
-              </RowFixed>
-              <Toggle isActive={darkMode} toggle={toggleDarkMode} />
-            </RowBetween>
+            <ChiRow/>
+
             <Text fontWeight={600} fontSize={14}>
               Interface Settings
             </Text>
