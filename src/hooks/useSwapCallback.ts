@@ -70,7 +70,6 @@ export function useSwapCallback(
           referalAddress = getAddress(referalAddressStr);
         }
 
-        debugger;
         args.push(...[
           trade.inputAmount.token.address,
           trade.outputAmount.token.address,
