@@ -23,6 +23,9 @@ import { useAllTransactions } from '../../state/transactions/hooks'
 import { NetworkContextName } from '../../constants'
 import { injected, walletconnect, walletlink, fortmatic, portis } from '../../connectors'
 import Loader from '../Loader'
+import ChiIcon from '../../assets/images/chi.png'
+import { MouseoverTooltip } from '../Tooltip'
+import { useHasChi } from '../../hooks/useChi'
 
 const IconWrapper = styled.div<{ size?: number }>`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -70,8 +73,8 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
   }
 
   ${({ faded }) =>
-    faded &&
-    css`
+  faded &&
+  css`
       background-color: ${({ theme }) => theme.primary5};
       border: 1px solid ${({ theme }) => theme.primary5};
       color: ${({ theme }) => theme.primaryText1};
@@ -126,16 +129,31 @@ function recentTransactionsOnly(a: TransactionDetails) {
   return new Date().getTime() - a.addedTime < 86_400_000
 }
 
-const SOCK = (
-  <span role="img" aria-label="has socks emoji" style={{ marginTop: -4, marginBottom: -4 }}>
-    🧦
-  </span>
-)
+function ChiComponent({enabled}) {
+  const tooltipText = enabled
+    ? 'Chi is enabled'
+    : 'You can activate CHI gas token in settings to pay less fees on ethereum transactions';
+
+  return (
+    <MouseoverTooltip text={tooltipText} placement={'bottom'}>
+      <img style={{
+        width: '16px',
+        marginLeft: '0.5rem',
+        marginRight: '0.25rem',
+        marginTop: '0.25rem',
+        filter: !enabled ? 'grayscale(100%)' : ''
+      }} src={ChiIcon} alt={tooltipText}/>
+    </MouseoverTooltip>
+  );
+}
 
 export default function Web3Status() {
   const { t } = useTranslation()
   const { active, account, connector, error } = useWeb3React()
   const contextNetwork = useWeb3React(NetworkContextName)
+
+  //const [] = useChiBalance();
+  const hasChi = useHasChi()
 
   const { ENSName } = useENSName(account)
 
@@ -150,35 +168,35 @@ export default function Web3Status() {
   const confirmed = sortedRecentTransactions.filter(tx => tx.receipt).map(tx => tx.hash)
 
   const hasPendingTransactions = !!pending.length
-  const hasSocks = useHasSocks()
+  // const hasSocks = useHasSocks()
   const toggleWalletModal = useWalletModalToggle()
 
   // handle the logo we want to show with the account
   function getStatusIcon() {
     if (connector === injected) {
-      return <Identicon />
+      return <Identicon/>
     } else if (connector === walletconnect) {
       return (
         <IconWrapper size={16}>
-          <img src={WalletConnectIcon} alt={''} />
+          <img src={WalletConnectIcon} alt={''}/>
         </IconWrapper>
       )
     } else if (connector === walletlink) {
       return (
         <IconWrapper size={16}>
-          <img src={CoinbaseWalletIcon} alt={''} />
+          <img src={CoinbaseWalletIcon} alt={''}/>
         </IconWrapper>
       )
     } else if (connector === fortmatic) {
       return (
         <IconWrapper size={16}>
-          <img src={FortmaticIcon} alt={''} />
+          <img src={FortmaticIcon} alt={''}/>
         </IconWrapper>
       )
     } else if (connector === portis) {
       return (
         <IconWrapper size={16}>
-          <img src={PortisIcon} alt={''} />
+          <img src={PortisIcon} alt={''}/>
         </IconWrapper>
       )
     }
@@ -190,21 +208,22 @@ export default function Web3Status() {
         <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
           {hasPendingTransactions ? (
             <RowBetween>
-              <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
+              <Text>{pending?.length} Pending</Text> <Loader stroke="white"/>
             </RowBetween>
           ) : (
             <>
-              {hasSocks ? SOCK : null}
+              {/*SOCK*/}
               <Text>{ENSName || shortenAddress(account)}</Text>
             </>
           )}
           {!hasPendingTransactions && getStatusIcon()}
+          <ChiComponent enabled={false}/>
         </Web3StatusConnected>
       )
     } else if (error) {
       return (
         <Web3StatusError onClick={toggleWalletModal}>
-          <NetworkIcon />
+          <NetworkIcon/>
           <Text>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error'}</Text>
         </Web3StatusError>
       )
@@ -224,7 +243,7 @@ export default function Web3Status() {
   return (
     <>
       {getWeb3Status()}
-      <WalletModal ENSName={ENSName} pendingTransactions={pending} confirmedTransactions={confirmed} />
+      <WalletModal ENSName={ENSName} pendingTransactions={pending} confirmedTransactions={confirmed}/>
     </>
   )
 }

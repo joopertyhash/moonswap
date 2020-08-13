@@ -341,6 +341,17 @@ export default function SettingsTab() {
               setDeadline={setDeadline}
             />
             <Text fontWeight={600} fontSize={14}>
+              Gas Token
+            </Text>
+            <RowBetween>
+              <RowFixed>
+                <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
+                  Activate CHI
+                </TYPE.black>
+              </RowFixed>
+              <Toggle isActive={darkMode} toggle={toggleDarkMode} />
+            </RowBetween>
+            <Text fontWeight={600} fontSize={14}>
               Interface Settings
             </Text>
             <RowBetween>

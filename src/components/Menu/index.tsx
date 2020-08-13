@@ -4,7 +4,6 @@ import { BookOpen, Code, Info, MessageCircle } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import useToggle from '../../hooks/useToggle'
-
 import { ExternalLink } from '../../theme'
 
 const StyledMenuIcon = styled(MenuIcon)`
