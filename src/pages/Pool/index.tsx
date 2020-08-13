@@ -19,6 +19,7 @@ import { usePairs } from '../../data-mooniswap/Reserves'
 import { useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
+import ReferralLink from '../../components/RefferalLink'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -29,7 +30,7 @@ export default function Pool() {
 
   const tokenPairsWithLiquidityTokens = pairs.map(([state, pair]) => {
     if (!pair) {
-      return undefined;
+      return undefined
     }
     return {
       liquidityToken: pair?.liquidityToken
@@ -61,7 +62,7 @@ export default function Pool() {
 
   const allV2PairsWithLiquidity = pairs.map(([, pair]) => pair).filter((pair): pair is Pair => {
     if (!pair) {
-      return false;
+      return false
     }
     return liquidityTokensWithBalances.findIndex((x) => {
       return x?.liquidityToken?.equals(pair.liquidityToken)
@@ -71,7 +72,7 @@ export default function Pool() {
   return (
     <>
       <AppBody>
-        <SwapPoolTabs active={'pool'} />
+        <SwapPoolTabs active={'pool'}/>
         <AutoColumn gap="lg" justify="center">
           <ButtonPrimary id="join-pool-button" as={Link} style={{ padding: 16 }} to={'/add/' + ZERO_ADDRESS
           }>
@@ -85,7 +86,7 @@ export default function Pool() {
               <Text color={theme.text1} fontWeight={500}>
                 Your Liquidity
               </Text>
-              <Question text="When you add liquidity, you are given pool tokens that represent your share. If you don’t see a pool you joined in this list, try importing a pool below." />
+              <Question text="When you add liquidity, you are given pool tokens that represent your share. If you don’t see a pool you joined in this list, try importing a pool below."/>
             </RowBetween>
 
             {!account ? (
@@ -103,7 +104,7 @@ export default function Pool() {
             ) : allV2PairsWithLiquidity?.length > 0 ? (
               <>
                 {allV2PairsWithLiquidity.map(v2Pair => (
-                  <FullPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
+                  <FullPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair}/>
                 ))}
               </>
             ) : (
@@ -116,11 +117,13 @@ export default function Pool() {
 
             <div>
               <Text textAlign="center" fontSize={14} style={{ padding: '.5rem 0 .5rem 0' }}>
-                {false ? 'Uniswap V1 liquidity found!' : "Don't see a pool you joined?"}{' '}
+                {'Don\'t see a pool you joined?'}{' '}
                 <StyledInternalLink id="import-pool-link" to={false ? '/migrate/v1' : '/find'}>
-                  {false ? 'Migrate now.' : 'Import it.'}
+                  {'Import it.'}
                 </StyledInternalLink>
               </Text>
+
+              {account ? <ReferralLink/> : ('')}
             </div>
           </AutoColumn>
         </AutoColumn>
