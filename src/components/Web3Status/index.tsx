@@ -5,7 +5,6 @@ import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
 import { darken, lighten } from 'polished'
 import { Activity } from 'react-feather'
 import useENSName from '../../hooks/useENSName'
-import { useHasSocks } from '../../hooks/useSocksBalance'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { TransactionDetails } from '../../state/transactions/reducer'
 
@@ -16,16 +15,19 @@ import { ButtonSecondary } from '../Button'
 import FortmaticIcon from '../../assets/images/fortmaticIcon.png'
 import WalletConnectIcon from '../../assets/images/walletConnectIcon.svg'
 import CoinbaseWalletIcon from '../../assets/images/coinbaseWalletIcon.svg'
-
 import { RowBetween } from '../Row'
 import { shortenAddress } from '../../utils'
 import { useAllTransactions } from '../../state/transactions/hooks'
-import { NetworkContextName } from '../../constants'
+import { CHI, NetworkContextName } from '../../constants'
 import { injected, walletconnect, walletlink, fortmatic, portis } from '../../connectors'
 import Loader from '../Loader'
 import ChiIcon from '../../assets/images/chi.png'
 import { MouseoverTooltip } from '../Tooltip'
 import { useHasChi } from '../../hooks/useChi'
+import { useApproveCallback } from '../../hooks/useApproveCallback'
+import { TokenAmount } from '@uniswap/sdk'
+import { ONE_SPLIT_ADDRESSES } from '../../constants/one-split'
+import JSBI from 'jsbi'
 
 const IconWrapper = styled.div<{ size?: number }>`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -149,11 +151,15 @@ function ChiComponent({enabled}) {
 
 export default function Web3Status() {
   const { t } = useTranslation()
-  const { active, account, connector, error } = useWeb3React()
+  const { active, account, connector, error, chainId } = useWeb3React()
   const contextNetwork = useWeb3React(NetworkContextName)
 
   //const [] = useChiBalance();
   const hasChi = useHasChi()
+
+  const amountToApprove = new TokenAmount(CHI, JSBI.BigInt(3));
+  const spenderAddress = ONE_SPLIT_ADDRESSES[chainId];
+  const [chiApproval] = useApproveCallback(amountToApprove, spenderAddress);
 
   const { ENSName } = useENSName(account)
 
@@ -217,7 +223,7 @@ export default function Web3Status() {
             </>
           )}
           {!hasPendingTransactions && getStatusIcon()}
-          <ChiComponent enabled={false}/>
+          <ChiComponent enabled={hasChi}/>
         </Web3StatusConnected>
       )
     } else if (error) {
