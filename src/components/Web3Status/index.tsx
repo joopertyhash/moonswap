@@ -23,11 +23,12 @@ import { injected, walletconnect, walletlink, fortmatic, portis } from '../../co
 import Loader from '../Loader'
 import ChiIcon from '../../assets/images/chi.png'
 import { MouseoverTooltip } from '../Tooltip'
-import { useHasChi } from '../../hooks/useChi'
-import { useApproveCallback } from '../../hooks/useApproveCallback'
+import  { useHasChi } from '../../hooks/useChi'
+import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { TokenAmount } from '@uniswap/sdk'
 import { ONE_SPLIT_ADDRESSES } from '../../constants/one-split'
 import JSBI from 'jsbi'
+import { MaxUint256 } from '@ethersproject/constants'
 
 const IconWrapper = styled.div<{ size?: number }>`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -131,10 +132,27 @@ function recentTransactionsOnly(a: TransactionDetails) {
   return new Date().getTime() - a.addedTime < 86_400_000
 }
 
-function ChiComponent({enabled}) {
-  const tooltipText = enabled
-    ? 'Chi is enabled'
-    : 'You can activate CHI gas token in settings to pay less fees on ethereum transactions';
+function ChiComponent() {
+
+  const { chainId } = useWeb3React()
+  const MIN_CHI_BALANCE = 5
+  const hasChi = useHasChi(0)
+  const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
+
+  const [approvalState] = useApproveCallback(
+    new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
+    ONE_SPLIT_ADDRESSES[chainId]
+  )
+
+  const successMessage = 'CHI token is activated!'
+  let tooltipText = successMessage
+  if (!hasChi || approvalState !== ApprovalState.APPROVED) {
+    tooltipText = `Activate CHI gas token in settings to pay less fees on ethereum transactions`
+  } else if (!hasEnoughChi) {
+    tooltipText = `Your CHI balance become too small`
+  }
+
+  const enabled = tooltipText === successMessage;
 
   return (
     <MouseoverTooltip text={tooltipText} placement={'bottom'}>
@@ -146,20 +164,13 @@ function ChiComponent({enabled}) {
         filter: !enabled ? 'grayscale(100%)' : ''
       }} src={ChiIcon} alt={tooltipText}/>
     </MouseoverTooltip>
-  );
+  )
 }
 
 export default function Web3Status() {
   const { t } = useTranslation()
-  const { active, account, connector, error, chainId } = useWeb3React()
+  const { active, account, connector, error } = useWeb3React()
   const contextNetwork = useWeb3React(NetworkContextName)
-
-  //const [] = useChiBalance();
-  const hasChi = useHasChi()
-
-  const amountToApprove = new TokenAmount(CHI, JSBI.BigInt(3));
-  const spenderAddress = ONE_SPLIT_ADDRESSES[chainId];
-  const [chiApproval] = useApproveCallback(amountToApprove, spenderAddress);
 
   const { ENSName } = useENSName(account)
 
@@ -223,7 +234,7 @@ export default function Web3Status() {
             </>
           )}
           {!hasPendingTransactions && getStatusIcon()}
-          <ChiComponent enabled={hasChi}/>
+          <ChiComponent/>
         </Web3StatusConnected>
       )
     } else if (error) {

@@ -13,7 +13,7 @@ export default function useChiBalance(): JSBI | undefined {
   return data ? JSBI.BigInt(data.toString()) : undefined
 }
 
-export function useHasChi(): boolean | undefined {
+export function useHasChi(minAmount: number): boolean | undefined {
   const balance = useChiBalance()
-  return useMemo(() => balance && JSBI.greaterThan(balance, JSBI.BigInt(0)), [balance])
+  return useMemo(() => balance && JSBI.greaterThan(balance, JSBI.BigInt(minAmount)), [balance, minAmount])
 }
