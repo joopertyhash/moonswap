@@ -2,7 +2,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { JSBI, TokenAmount, Trade } from '@uniswap/sdk'
 import { useMemo } from 'react'
-import { INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { INITIAL_ALLOWED_SLIPPAGE, REFERRAL_ADDRESS_STORAGE_KEY } from '../constants'
 import { getTradeVersion } from '../data/V1'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin, getMooniswapContract, getOneSplit, isUseOneSplitContract } from '../utils'
@@ -13,6 +13,9 @@ import {
   FLAG_DISABLE_ALL_WRAP_SOURCES,
   FLAG_DISABLE_MOONISWAP_ALL
 } from '../constants/one-split'
+import { getAddress, isAddress } from '@ethersproject/address'
+
+
 
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
@@ -29,7 +32,7 @@ export function useSwapCallback(
   const { account, chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
 
-  const isOneSplit = isUseOneSplitContract(distribution);
+  const isOneSplit = isUseOneSplitContract(distribution)
 
   const recipient = account
 
@@ -61,24 +64,30 @@ export function useSwapCallback(
         const minReturn = BigNumber.from(trade.outputAmount.raw.toString())
           .mul(String(10000 - allowedSlippage)).div(String(10000))
 
+        const referalAddressStr = localStorage.getItem(REFERRAL_ADDRESS_STORAGE_KEY)
+        let referalAddress = '0x68a17B587CAF4f9329f0e372e3A78D23A46De6b5';
+        if (referalAddressStr && isAddress(referalAddressStr) ) {
+          referalAddress = getAddress(referalAddressStr);
+        }
+
         args.push(...[
           trade.inputAmount.token.address,
           trade.outputAmount.token.address,
           fromAmount?.raw.toString(),
           minReturn.toString(),
-          '0x68a17B587CAF4f9329f0e372e3A78D23A46De6b5'
+          referalAddress
         ])
       }
 
       let value: BigNumber | undefined
       if (trade.inputAmount.token.symbol === 'ETH') {
-          value = BigNumber.from(fromAmount.raw.toString())
+        value = BigNumber.from(fromAmount.raw.toString())
       }
 
       const safeGasEstimate = contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
         .then(calculateGasMargin)
         .catch(error => {
-          console.error(`estimateGas failed for ${ 'swap' }`, error)
+          console.error(`estimateGas failed for ${'swap'}`, error)
           return undefined
         })
 
@@ -98,11 +107,11 @@ export function useSwapCallback(
           const inputAmount = trade.inputAmount.toSignificant(3)
           const outputAmount = trade.outputAmount.toSignificant(3)
 
-          const base = `Swap ${ inputAmount } ${ inputSymbol } for ${ outputAmount } ${ outputSymbol }`
+          const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
           const withRecipient = base
 
           const withVersion =
-            tradeVersion === Version.v2 ? withRecipient : `${ withRecipient } on ${ (tradeVersion as any).toUpperCase() }`
+            tradeVersion === Version.v2 ? withRecipient : `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`
 
           addTransaction(response, {
             summary: withVersion
