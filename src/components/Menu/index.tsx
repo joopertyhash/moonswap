@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 // import { Info, BookOpen, Code, PieChart, MessageCircle } from 'react-feather'
-import { BookOpen, Code, Info, MessageCircle } from 'react-feather'
+import { BookOpen, Code, Info, MessageCircle, PieChart } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import useToggle from '../../hooks/useToggle'
@@ -114,6 +114,10 @@ export default function Menu() {
             <Info size={14} />
             About
           </MenuItem>
+          <MenuItem id="link" href="https://mooniswap.info/">
+            <PieChart size={14} />
+            Analytics
+          </MenuItem>
           <MenuItem id="link" href={CODE_LINK}>
             <Code size={14} />
             Code
@@ -134,10 +138,6 @@ export default function Menu() {
             <BookOpen size={14} />
             Audit 2
           </MenuItem>
-          {/*<MenuItem id="link" href="https://uniswap.info/">*/}
-          {/*  <PieChart size={14} />*/}
-          {/*  Analytics*/}
-          {/*</MenuItem>*/}
         </MenuFlyout>
       )}
     </StyledMenu>
