@@ -11,38 +11,74 @@ import { RowBetween, RowFixed } from '../Row'
 import { TYPE } from '../../theme'
 import Toggle from '../Toggle'
 import { ThemeContext } from 'styled-components'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+
+export function ChiStateControl({ state, approveCHI }) {
+
+  const isApproved = state === ApprovalState.APPROVED;
+  const [chiEnabledFlag, setChiEnabledFlag]
+    = useLocalStorage('chiEnabled', false)
+
+  if (state === ApprovalState.UNKNOWN) {
+    return (
+      <>
+        'loading'
+      </>
+    )
+  }
+
+  if (state === ApprovalState.PENDING) {
+    return (
+      <>
+        'pending'
+      </>
+    )
+  }
+
+  return (
+    <Toggle isActive={isApproved && chiEnabledFlag} toggle={() => {
+      const newValue = !chiEnabledFlag;
+      setChiEnabledFlag(newValue)
+      if(newValue === true && !isApproved) {
+        approveCHI();
+      }
+    }}/>
+  )
+}
 
 export function ChiRow() {
 
   const { chainId } = useWeb3React()
-  const MIN_CHI_BALANCE = 5
+  // const MIN_CHI_BALANCE = 5
   const hasChi = useHasChi(0)
-  const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
-  const [approvalState] = useApproveCallback(
+  const [approvalState, approveCHI] = useApproveCallback(
     new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
     ONE_SPLIT_ADDRESSES[chainId]
   )
 
-  const successMessage = 'CHI token is activated!'
-  let tooltipText = successMessage
-  if (!hasChi || approvalState !== ApprovalState.APPROVED) {
-    tooltipText = `Activate CHI gas token in settings to pay less fees on ethereum transactions`
-  } else if (!hasEnoughChi) {
-    tooltipText = `Your CHI balance become too small`
-  }
-
-  const enabled = tooltipText === successMessage
   const theme = useContext(ThemeContext)
 
   return (
     <RowBetween>
       <RowFixed>
         <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
-          Activate CHI
+          {
+            hasChi ? 'Activate CHI' : `Don't have CHI to activate`
+          }
         </TYPE.black>
       </RowFixed>
-      {/*<Toggle isActive={darkMode} toggle={toggleDarkMode}/>*/}
+      {
+        hasChi
+          ? <ChiStateControl state={approvalState} approveCHI={approveCHI}/>
+          : ''
+      }
+
     </RowBetween>
   )
 }
+
+
+
+
+

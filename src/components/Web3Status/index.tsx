@@ -147,7 +147,7 @@ function ChiComponent() {
   const successMessage = 'CHI token is activated!'
   let tooltipText = successMessage
   if (!hasChi || approvalState !== ApprovalState.APPROVED) {
-    tooltipText = `Activate CHI gas token in settings to pay less fees on ethereum transactions`
+    tooltipText = `Activate CHI gas token in settings to pay less fees for ethereum transactions`
   } else if (!hasEnoughChi) {
     tooltipText = `Your CHI balance become too small`
   }
