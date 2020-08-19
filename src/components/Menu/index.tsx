@@ -138,6 +138,10 @@ export default function Menu() {
             <BookOpen size={14} />
             Audit 2
           </MenuItem>
+          <MenuItem id="link" href={process.env.PUBLIC_URL + '/docs/mooniswap-audit-report-3.pdf'}>
+            <BookOpen size={14} />
+            Audit 3
+          </MenuItem>
         </MenuFlyout>
       )}
     </StyledMenu>
