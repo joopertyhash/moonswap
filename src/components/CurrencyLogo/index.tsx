@@ -3,8 +3,6 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import EthereumLogo from '../../assets/images/ethereum-logo.png'
-import { WrappedTokenInfo } from '../../state/lists/hooks'
-import uriToHttp from '../../utils/uriToHttp'
 
 const getTokenLogoURL = address =>
   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
@@ -57,12 +55,6 @@ export default function CurrencyLogo({
 
   if (currency instanceof Token) {
     let uri: string | undefined
-
-    if (currency instanceof WrappedTokenInfo) {
-      if (currency.logoURI && !BAD_URIS[currency.logoURI]) {
-        uri = uriToHttp(currency.logoURI).filter(s => !BAD_URIS[s])[0]
-      }
-    }
 
     if (!uri) {
       const defaultUri = getTokenLogoURL(currency.address)
