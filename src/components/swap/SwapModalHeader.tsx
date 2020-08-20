@@ -15,14 +15,14 @@ export default function SwapModalHeader({
   currencies,
   formattedAmounts,
   slippageAdjustedAmounts,
-  priceImpactSeverity,
+  // priceImpactSeverity,
   independentField,
   recipient
 }: {
   currencies: { [field in Field]?: Token }
   formattedAmounts: { [field in Field]?: string }
   slippageAdjustedAmounts: { [field in Field]?: TokenAmount }
-  priceImpactSeverity: number
+  // priceImpactSeverity: number
   independentField: Field
   recipient: string | null
 }) {
@@ -45,7 +45,8 @@ export default function SwapModalHeader({
         <ArrowDown size="16" color={theme.text2} />
       </RowFixed>
       <RowBetween align="flex-end">
-        <TruncatedText fontSize={24} fontWeight={500} color={priceImpactSeverity > 2 ? theme.red1 : ''}>
+        {/*<TruncatedText fontSize={24} fontWeight={500} color={priceImpactSeverity > 2 ? theme.red1 : ''}>*/}
+        <TruncatedText fontSize={24} fontWeight={500}>
           {formattedAmounts[Field.OUTPUT]}
         </TruncatedText>
         <RowFixed gap="4px">

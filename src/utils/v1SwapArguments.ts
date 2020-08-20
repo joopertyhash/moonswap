@@ -1,6 +1,6 @@
 import { MaxUint256 } from '@ethersproject/constants'
 import { TokenAmount, ETHER, Token, Trade, TradeType } from '@uniswap/sdk'
-import { getTradeVersion } from '../data/V1'
+import { getTradeVersion } from '../data-mooniswap/V1'
 import { Version } from '../hooks/useToggledVersion'
 
 function toHex(currencyAmount: TokenAmount): string {
@@ -20,9 +20,9 @@ export default function v1SwapArguments(trade: Trade, options: Omit<any, 'feeOnT
   if (getTradeVersion(trade) !== Version.v1) {
     throw new Error('invalid trade version')
   }
-  if (trade.route.pairs.length > 2) {
-    throw new Error('too many pairs')
-  }
+  // if (trade.route.pairs.length > 2) {
+  //   throw new Error('too many pairs')
+  // }
   const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
   const inputETH = trade.inputAmount.token === ETHER
   const outputETH = trade.outputAmount.token === ETHER

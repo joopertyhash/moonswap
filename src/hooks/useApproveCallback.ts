@@ -2,7 +2,7 @@ import { MaxUint256 } from '@ethersproject/constants'
 import { TransactionResponse } from '@ethersproject/providers'
 import { Trade, TokenAmount, ETHER, ChainId } from '@uniswap/sdk'
 import { useCallback, useMemo } from 'react'
-import { useTokenAllowance } from '../data/Allowances'
+import { useTokenAllowance } from '../data-mooniswap/Allowances'
 import { Field } from '../state/swap/actions'
 import { useTransactionAdder, useHasPendingApproval } from '../state/transactions/hooks'
 import { computeSlippageAdjustedAmounts } from '../utils/prices'
@@ -113,7 +113,7 @@ export function useApproveCallbackFromTrade(trade?: Trade, distribution?: BigNum
 
   const spenderAddress = isUseOneSplitContract(distribution)
     ? ONE_SPLIT_ADDRESSES[ChainId.MAINNET]
-    : trade?.route.pairs[0].liquidityToken.address
+    : trade?.route.route[0].pairs[0].liquidityToken.address
 
   return useApproveCallback(amountToApprove, spenderAddress)
 }

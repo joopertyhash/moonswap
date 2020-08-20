@@ -1,4 +1,4 @@
-import { TokenAmount, Percent, Trade } from '@uniswap/sdk'
+import { TokenAmount, Trade } from '@uniswap/sdk'
 import React, { useContext } from 'react'
 import { Repeat } from 'react-feather'
 import { Text } from 'rebass'
@@ -10,30 +10,29 @@ import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
 import QuestionHelper from '../QuestionHelper'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
-import FormattedPriceImpact from './FormattedPriceImpact'
 import { StyledBalanceMaxMini } from './styleds'
 
 export default function SwapModalFooter({
   trade,
   showInverted,
   setShowInverted,
-  severity,
+  // severity,
   slippageAdjustedAmounts,
   onSwap,
   parsedAmounts,
-  realizedLPFee,
-  priceImpactWithoutFee,
+  // realizedLPFee,
+  // priceImpactWithoutFee,
   confirmText
 }: {
   trade?: Trade
   showInverted: boolean
   setShowInverted: (inverted: boolean) => void
-  severity: number
+  // severity: number
   slippageAdjustedAmounts?: { [field in Field]?: TokenAmount }
   onSwap: () => any
   parsedAmounts?: { [field in Field]?: TokenAmount }
-  realizedLPFee?: TokenAmount
-  priceImpactWithoutFee?: Percent
+  // realizedLPFee?: TokenAmount
+  // priceImpactWithoutFee?: Percent
   confirmText: string
 }) {
   const theme = useContext(ThemeContext)
@@ -89,30 +88,31 @@ export default function SwapModalFooter({
             )}
           </RowFixed>
         </RowBetween>
-        <RowBetween>
-          <RowFixed>
-            <TYPE.black color={theme.text2} fontSize={14} fontWeight={400}>
-              Price Impact
-            </TYPE.black>
-            <QuestionHelper text="The difference between the market price and your price due to trade size." />
-          </RowFixed>
-          <FormattedPriceImpact priceImpact={priceImpactWithoutFee} />
-        </RowBetween>
-        <RowBetween>
-          <RowFixed>
-            <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>
-              Liquidity Provider Fee
-            </TYPE.black>
-            <QuestionHelper text="A portion of each trade (0.30%) goes to liquidity providers as a protocol incentive." />
-          </RowFixed>
-          <TYPE.black fontSize={14}>
-            {realizedLPFee ? realizedLPFee?.toSignificant(6) + ' ' + trade?.inputAmount?.token?.symbol : '-'}
-          </TYPE.black>
-        </RowBetween>
+        {/*<RowBetween>*/}
+        {/*  <RowFixed>*/}
+        {/*    <TYPE.black color={theme.text2} fontSize={14} fontWeight={400}>*/}
+        {/*      Price Impact*/}
+        {/*    </TYPE.black>*/}
+        {/*    <QuestionHelper text="The difference between the market price and your price due to trade size." />*/}
+        {/*  </RowFixed>*/}
+        {/*  <FormattedPriceImpact priceImpact={priceImpactWithoutFee} />*/}
+        {/*</RowBetween>*/}
+        {/*<RowBetween>*/}
+        {/*  <RowFixed>*/}
+        {/*    <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>*/}
+        {/*      Liquidity Provider Fee*/}
+        {/*    </TYPE.black>*/}
+        {/*    <QuestionHelper text="A portion of each trade (0.30%) goes to liquidity providers as a protocol incentive." />*/}
+        {/*  </RowFixed>*/}
+        {/*  <TYPE.black fontSize={14}>*/}
+        {/*    {realizedLPFee ? realizedLPFee?.toSignificant(6) + ' ' + trade?.inputAmount?.token?.symbol : '-'}*/}
+        {/*  </TYPE.black>*/}
+        {/*</RowBetween>*/}
       </AutoColumn>
 
       <AutoRow>
-        <ButtonError onClick={onSwap} error={severity > 2} style={{ margin: '10px 0 0 0' }} id="confirm-swap-or-send">
+        {/*<ButtonError onClick={onSwap} error={severity > 2} style={{ margin: '10px 0 0 0' }} id="confirm-swap-or-send">*/}
+        <ButtonError onClick={onSwap} style={{ margin: '10px 0 0 0' }} id="confirm-swap-or-send">
           <Text fontSize={20} fontWeight={500}>
             {confirmText}
           </Text>

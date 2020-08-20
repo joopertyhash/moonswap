@@ -11,16 +11,13 @@ import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween } from '../../components/Row'
 import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetailsDropdown'
-import BetterTradeLink from '../../components/swap/BetterTradeLink'
-import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
 import { ArrowWrapper, BottomGrouping, Dots, Wrapper } from '../../components/swap/styleds'
 import SwapModalFooter from '../../components/swap/SwapModalFooter'
 import SwapModalHeader from '../../components/swap/SwapModalHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { TokenWarningCards } from '../../components/TokenWarningCard'
 
-import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
-import { isTradeBetter } from '../../data/V1'
+import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
 import { useSwapCallback } from '../../hooks/useSwapCallback'
@@ -41,7 +38,7 @@ import {
 } from '../../state/user/hooks'
 import { CursorPointer, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
-import { computeSlippageAdjustedAmounts, computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
+import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
@@ -66,7 +63,7 @@ export default function Swap() {
   // swap state
   const { independentField, typedValue } = useSwapState()
   const { onSwitchTokens, onCurrencySelection, onUserInput } = useSwapActionHandlers()
-  const { v1Trade, v2Trade, mooniswapTrade, currencyBalances, parsedAmount, currencies, error } = useDerivedSwapInfo()
+  const { mooniswapTrade, currencyBalances, parsedAmount, currencies, error } = useDerivedSwapInfo()
 
   const distribution = mooniswapTrade?.[1]
 
@@ -80,17 +77,8 @@ export default function Swap() {
   const trade = showWrap
     ? undefined
     : {
-      [Version.v1]: v1Trade,
-      [Version.v2]: v2Trade,
-      [Version.v3]: mooniswapTrade?.[0]
+      [Version.v1]: mooniswapTrade?.[0]
     }[toggledVersion]
-
-  const betterTradeLinkVersion: Version | undefined =
-    toggledVersion === Version.v2 && isTradeBetter(v2Trade, v1Trade, BETTER_TRADE_LINK_THRESHOLD)
-      ? Version.v1
-      : toggledVersion === Version.v1 && isTradeBetter(v1Trade, v2Trade)
-      ? Version.v2
-      : undefined
 
   const parsedAmounts = showWrap
     ? {
@@ -154,13 +142,13 @@ export default function Swap() {
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   const slippageAdjustedAmounts = computeSlippageAdjustedAmounts(trade, allowedSlippage)
-
-  const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade)
+  // const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade)
 
   function onSwap() {
-    if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
-      return
-    }
+    // todo: warnings!
+    // if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
+    //   return
+    // }
     if (!swapCallback) {
       return
     }
@@ -193,7 +181,7 @@ export default function Swap() {
   const [showInverted, setShowInverted] = useState<boolean>(false)
 
   // warnings on slippage
-  const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
+  // const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
 
   // show approve flow when: no error on inputs, not approved or pending, or approved in current session
   // never show if price impact is above threshold in non expert mode
@@ -201,8 +189,8 @@ export default function Swap() {
     !error &&
     (approval === ApprovalState.NOT_APPROVED ||
       approval === ApprovalState.PENDING ||
-      (approvalSubmitted && approval === ApprovalState.APPROVED)) &&
-    !(priceImpactSeverity > 3 && !expertMode)
+      (approvalSubmitted && approval === ApprovalState.APPROVED))
+    // !(priceImpactSeverity > 3 && !expertMode)
 
   function modalHeader() {
     return (
@@ -210,7 +198,7 @@ export default function Swap() {
         currencies={currencies}
         formattedAmounts={formattedAmounts}
         slippageAdjustedAmounts={slippageAdjustedAmounts}
-        priceImpactSeverity={priceImpactSeverity}
+        // priceImpactSeverity={priceImpactSeverity}
         independentField={independentField}
         recipient={account as (string | null)}
       />
@@ -220,14 +208,15 @@ export default function Swap() {
   function modalBottom() {
     return (
       <SwapModalFooter
-        confirmText={priceImpactSeverity > 2 ? 'Swap Anyway' : 'Confirm Swap'}
+        // confirmText={priceImpactSeverity > 2 ? 'Swap Anyway' : 'Confirm Swap'}
+        confirmText={'Confirm Swap'}
         showInverted={showInverted}
-        severity={priceImpactSeverity}
+        // severity={priceImpactSeverity}
         setShowInverted={setShowInverted}
         onSwap={onSwap}
-        realizedLPFee={realizedLPFee}
+        // realizedLPFee={realizedLPFee}
         parsedAmounts={parsedAmounts}
-        priceImpactWithoutFee={priceImpactWithoutFee}
+        // priceImpactWithoutFee={priceImpactWithoutFee}
         slippageAdjustedAmounts={slippageAdjustedAmounts}
         trade={trade}
       />
@@ -388,15 +377,20 @@ export default function Swap() {
                   }}
                   width="48%"
                   id="swap-button"
-                  disabled={!isValid || approval !== ApprovalState.APPROVED || (priceImpactSeverity > 3 && !expertMode) || notEnoughBalance}
-                  error={isValid && priceImpactSeverity > 2}
+                  // disabled={!isValid || approval !== ApprovalState.APPROVED || (priceImpactSeverity > 3 && !expertMode) || notEnoughBalance}
+                  disabled={!isValid || approval !== ApprovalState.APPROVED || notEnoughBalance}
+                  // error={isValid && priceImpactSeverity > 2}
+                  error={isValid}
                 >
                   <Text fontSize={16} fontWeight={500}>
+                    {/*{notEnoughBalance*/}
+                    {/*  ? `Not enough balance`*/}
+                    {/*  : priceImpactSeverity > 3 && !expertMode*/}
+                    {/*    ? `Price Impact High`*/}
+                    {/*    : `Swap${priceImpactSeverity > 2 ? ' Anyway' : ''}`}*/}
                     {notEnoughBalance
                       ? `Not enough balance`
-                      : priceImpactSeverity > 3 && !expertMode
-                        ? `Price Impact High`
-                        : `Swap${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
+                      : 'Swap'}
                   </Text>
                 </ButtonError>
               </RowBetween>
@@ -406,21 +400,28 @@ export default function Swap() {
                   expertMode ? onSwap() : setShowConfirm(true)
                 }}
                 id="swap-button"
-                disabled={!isValid || (priceImpactSeverity > 3 && !expertMode) || notEnoughBalance}
-                error={isValid && priceImpactSeverity > 2}
+                // disabled={!isValid || (priceImpactSeverity > 3 && !expertMode) || notEnoughBalance}
+                disabled={!isValid || notEnoughBalance}
+                // error={isValid && priceImpactSeverity > 2}
+                error={!isValid}
               >
                 <Text fontSize={20} fontWeight={500}>
+                  {/*{error*/}
+                  {/*  ? error*/}
+                  {/*  : notEnoughBalance*/}
+                  {/*    ? `Not enough balance`*/}
+                  {/*    : priceImpactSeverity > 3 && !expertMode*/}
+                  {/*      ? `Price Impact Too High`*/}
+                  {/*      : `Swap${priceImpactSeverity > 2 ? ' Anyway' : ''}`}*/}
                   {error
                     ? error
                     : notEnoughBalance
                       ? `Not enough balance`
-                      : priceImpactSeverity > 3 && !expertMode
-                        ? `Price Impact Too High`
-                        : `Swap${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
+                      : `Swap`}
                 </Text>
               </ButtonError>
             )}
-            {betterTradeLinkVersion && <BetterTradeLink version={betterTradeLinkVersion}/>}
+            {/*{betterTradeLinkVersion && <BetterTradeLink version={betterTradeLinkVersion}/>}*/}
           </BottomGrouping>
 
           {account ? (<ReferralLink/>) : ('')}

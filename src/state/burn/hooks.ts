@@ -2,7 +2,7 @@ import { Token, TokenAmount, JSBI, Pair, Percent } from '@uniswap/sdk'
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { usePair } from '../../data-mooniswap/Reserves'
-import { useTotalSupply } from '../../data/TotalSupply'
+import { useTotalSupply } from '../../data-mooniswap/TotalSupply'
 
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'

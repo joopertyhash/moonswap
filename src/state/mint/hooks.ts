@@ -1,8 +1,8 @@
 import { Token, TokenAmount, ETHER, JSBI, Pair, Percent, Price } from '@uniswap/sdk'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { PairState, usePair } from '../../data/Reserves'
-import { useTotalSupply } from '../../data/TotalSupply'
+import { PairState, usePair } from '../../data-mooniswap/Reserves'
+import { useTotalSupply } from '../../data-mooniswap/TotalSupply'
 
 import { useActiveWeb3React } from '../../hooks'
 import { wrappedCurrency, wrappedCurrencyAmount } from '../../utils/wrappedCurrency'

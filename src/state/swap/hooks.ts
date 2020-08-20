@@ -1,13 +1,11 @@
-import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import { parseUnits } from '@ethersproject/units'
 import { Token, TokenAmount, JSBI, Trade, ZERO_ADDRESS } from '@uniswap/sdk'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useMooniswapTrade, useV1Trade } from '../../data-mooniswap/V1'
+import { useMooniswapTrade } from '../../data-mooniswap/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import { useTradeExactIn, useTradeExactOut } from '../../hooks/Trades'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
@@ -94,14 +92,10 @@ export function useDerivedSwapInfo(): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
   parsedAmount: TokenAmount | undefined
-  v2Trade: Trade | undefined
   error?: string
-  v1Trade: Trade | undefined
   mooniswapTrade: [Trade, BigNumber[]] | [undefined, undefined] | undefined
 } {
   const { account } = useActiveWeb3React()
-
-  const toggledVersion = useToggledVersion()
 
   const {
     independentField,
@@ -123,10 +117,10 @@ export function useDerivedSwapInfo(): {
   const isExactIn: boolean = independentField === Field.INPUT
   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
 
-  const bestTradeExactIn = useTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
-  const bestTradeExactOut = useTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
+  // const bestTradeExactIn = useTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
+  // const bestTradeExactOut = useTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
 
-  const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut
+  // const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut
 
   const currencyBalances = {
     [Field.INPUT]: relevantTokenBalances[0],
@@ -137,9 +131,6 @@ export function useDerivedSwapInfo(): {
     [Field.INPUT]: inputCurrency ?? undefined,
     [Field.OUTPUT]: outputCurrency ?? undefined
   }
-
-  // get link to trade on v1, if a better rate exists
-  const v1Trade = useV1Trade(isExactIn, currencies[Field.INPUT], currencies[Field.OUTPUT], parsedAmount)
 
   let error: string | undefined
   if (!account) {
@@ -160,21 +151,14 @@ export function useDerivedSwapInfo(): {
 
   const [allowedSlippage] = useUserSlippageTolerance()
 
-  const slippageAdjustedAmounts = v2Trade && allowedSlippage && computeSlippageAdjustedAmounts(v2Trade, allowedSlippage)
-
-  const slippageAdjustedAmountsV1 =
-    v1Trade && allowedSlippage && computeSlippageAdjustedAmounts(v1Trade, allowedSlippage)
 
   const mooniswapTrade = useMooniswapTrade(currencies[Field.INPUT], currencies[Field.OUTPUT], parsedAmount)
+  const slippageAdjustedAmounts = mooniswapTrade && allowedSlippage && computeSlippageAdjustedAmounts(mooniswapTrade[0], allowedSlippage)
 
   // compare input balance to max input based on version
   const [balanceIn, amountIn] = [
     currencyBalances[Field.INPUT],
-    toggledVersion === Version.v1
-      ? slippageAdjustedAmountsV1
-        ? slippageAdjustedAmountsV1[Field.INPUT]
-        : null
-      : slippageAdjustedAmounts
+    slippageAdjustedAmounts
       ? slippageAdjustedAmounts[Field.INPUT]
       : null
   ]
@@ -187,9 +171,7 @@ export function useDerivedSwapInfo(): {
     currencies,
     currencyBalances,
     parsedAmount,
-    v2Trade: v2Trade ?? undefined,
     error,
-    v1Trade,
     mooniswapTrade,
   }
 }

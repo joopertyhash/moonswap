@@ -11,6 +11,8 @@ import {
   Route,
   Trade,
   TradeType,
+  RoutePath,
+  RouteSplit
 } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from '../hooks'
@@ -40,14 +42,6 @@ export class MockV1Pair extends Pair {
   constructor(etherAmount: BigintIsh, tokenAmount: TokenAmount) {
     super(tokenAmount, new TokenAmount(ETHER, etherAmount), '0x0001')
   }
-}
-
-function useMockV1Pair(inputCurrency?: Token): MockV1Pair | undefined {
-  return useMemo(
-    () =>
-      undefined,
-    []
-  )
 }
 
 // returns all v1 exchange addresses in the user's token list
@@ -94,52 +88,8 @@ export function useUserHasLiquidityInAllTokens(): boolean | undefined {
   )
 }
 
-/**
- * Returns the trade to execute on V1 to go between input and output token
- */
-export function useV1Trade(
-  isExactIn?: boolean,
-  inputCurrency?: Token,
-  outputCurrency?: Token,
-  exactAmount?: TokenAmount
-): Trade | undefined {
-  // get the mock v1 pairs
-  const inputPair = useMockV1Pair(inputCurrency)
-  const outputPair = useMockV1Pair(outputCurrency)
-
-  const inputIsETH = inputCurrency === ETHER
-  const outputIsETH = outputCurrency === ETHER
-
-  // construct a direct or through ETH v1 route
-  let pairs: Pair[] = []
-  if (inputIsETH && outputPair) {
-    pairs = [outputPair]
-  } else if (outputIsETH && inputPair) {
-    pairs = [inputPair]
-  }
-  // if neither are ETH, it's token-to-token (if they both exist)
-  else if (inputPair && outputPair) {
-    pairs = [inputPair, outputPair]
-  }
-
-  const route = inputCurrency && pairs && pairs.length > 0 && new Route(pairs, inputCurrency, outputCurrency)
-  let v1Trade: Trade | undefined
-  try {
-    v1Trade =
-      route && exactAmount
-        ? new Trade(route, exactAmount, isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT)
-        : undefined
-  } catch (error) {
-    console.error('Failed to create V1 trade', error)
-  }
-  return v1Trade
-}
-
-export function getTradeVersion(trade?: Trade): Version | undefined {
-  const isV1 = trade?.route?.pairs?.some(pair => pair instanceof MockV1Pair)
-  if (isV1) return Version.v1
-  if (isV1 === false) return Version.v2
-  return undefined
+export function getTradeVersion(trade?: Trade): Version {
+  return Version.v1
 }
 
 // returns the v1 exchange against which a trade should be executed
@@ -199,19 +149,20 @@ export function useMooniswapTrade(
     inputCurrency?.address ? inputCurrency.address !== ZERO_ADDRESS ? inputCurrency.address : ETH_ADDRESS : ETH_ADDRESS,
     outputCurrency?.address ? outputCurrency.address !== ZERO_ADDRESS ? outputCurrency.address : ETH_ADDRESS : ETH_ADDRESS,
     amount,
-    1,
-    JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL)).toString()
+    100,
+    // JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL)).toString()
+    0
   ]
 
   const poolPair = usePair(inputCurrency, outputCurrency)
 
-  const poolPairOverEth = usePair(inputCurrency, ETHER)
-  const poolPairOverDai = usePair(inputCurrency, DAI)
-  const poolPairOverUsdc = usePair(inputCurrency, USDC)
-
-  const poolPairUsdcToDest = usePair(USDC, outputCurrency)
-  const poolPairDaiToDest = usePair(DAI, outputCurrency)
-  const poolPairEthToDest = usePair(USDC, outputCurrency)
+  // const poolPairOverEth = usePair(inputCurrency, ETHER)
+  // const poolPairOverDai = usePair(inputCurrency, DAI)
+  // const poolPairOverUsdc = usePair(inputCurrency, USDC)
+  //
+  // const poolPairUsdcToDest = usePair(USDC, outputCurrency)
+  // const poolPairDaiToDest = usePair(DAI, outputCurrency)
+  // const poolPairEthToDest = usePair(USDC, outputCurrency)
 
   const results = useSingleCallResult(useOneSplit(), 'getExpectedReturn', params)
   if(!inputCurrency || !outputCurrency || !parseAmount || !results.result) {
@@ -220,34 +171,51 @@ export function useMooniswapTrade(
 
   const distribution = results.result.distribution
 
-  const pairs: Pair[] = []
-  if (!distribution[31].isZero() && poolPairOverEth[1] && poolPairEthToDest[1]) {
-    pairs.push(poolPairOverEth[1])
-    pairs.push(poolPairEthToDest[1])
-  }
-  if (!distribution[32].isZero() && poolPairOverDai[1] && poolPairDaiToDest[1]) {
-    pairs.push(poolPairOverDai[1])
-    pairs.push(poolPairDaiToDest[1])
-  }
-  if (!distribution[33].isZero() && poolPairOverUsdc[1] && poolPairUsdcToDest[1]) {
-    pairs.push(poolPairOverUsdc[1])
-    pairs.push(poolPairUsdcToDest[1])
-  }
-  if (!distribution[12].isZero() && poolPair[1]) {
-    pairs.push(poolPair[1])
+  const path: RoutePath = []
+  // if (!distribution[31].isZero() && poolPairOverEth[1] && poolPairEthToDest[1]) {
+  //   const subPath: RouteSplit = {
+  //     pairs: [poolPairOverEth[1], poolPairEthToDest[1]],
+  //     percent: new Percent(JSBI.BigInt(distribution[31]))
+  //   };
+  //   path.push(subPath)
+  // }
+  // if (!distribution[32].isZero() && poolPairOverDai[1] && poolPairDaiToDest[1]) {
+  //   const subPath: RouteSplit = {
+  //     pairs: [poolPairOverDai[1], poolPairDaiToDest[1]],
+  //     percent: new Percent(JSBI.BigInt(distribution[32]))
+  //   };
+  //   path.push(subPath)
+  // }
+  // if (!distribution[33].isZero() && poolPairOverUsdc[1] && poolPairUsdcToDest[1]) {
+  //   const subPath: RouteSplit = {
+  //     pairs: [poolPairOverUsdc[1], poolPairUsdcToDest[1]],
+  //     percent: new Percent(JSBI.BigInt(distribution[33]))
+  //   };
+  //   path.push(subPath)
+  // }
+  // if (!distribution[12].isZero() && poolPair[1]) {
+  if (poolPair[1]) {
+    const subPath: RouteSplit = {
+      pairs: [poolPair[1]],
+      percent: new Percent(JSBI.BigInt(distribution[12]))
+    };
+    path.push(subPath)
   }
 
-  if (pairs.length === 0) {
+  if (path.length === 0) {
     return
   }
 
-  const exactAmount = new TokenAmount(outputCurrency, JSBI.BigInt(results.result.returnAmount))
+  console.log(results.result.distribution.map(x => x.toString()))
 
-  const route = inputCurrency && pairs && pairs.length > 0 && new Route(pairs, inputCurrency, outputCurrency)
+  const exactAmount = parseAmount
+  const exactOutput = new TokenAmount(outputCurrency, results.result.returnAmount)
+
+  const route = inputCurrency && path && path.length > 0 && new Route(path, inputCurrency, outputCurrency)
   try {
     mooniswapTrade =
       route && exactAmount
-        ? new Trade(route, exactAmount, TradeType.EXACT_OUTPUT)
+        ? new Trade(route, exactAmount, TradeType.EXACT_OUTPUT, exactOutput)
         : undefined
   } catch (error) {
     console.error('Failed to create mooniswapTrade trade', error)

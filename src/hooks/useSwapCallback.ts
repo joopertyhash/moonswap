@@ -3,11 +3,10 @@ import { Contract } from '@ethersproject/contracts'
 import { JSBI, TokenAmount, Trade } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { INITIAL_ALLOWED_SLIPPAGE, REFERRAL_ADDRESS_STORAGE_KEY } from '../constants'
-import { getTradeVersion } from '../data/V1'
+import { getTradeVersion } from '../data-mooniswap/V1'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin, getMooniswapContract, getOneSplit, isUseOneSplitContract } from '../utils'
 import { useActiveWeb3React } from './index'
-import { Version } from './useToggledVersion'
 import {
   FLAG_DISABLE_ALL_SPLIT_SOURCES,
   FLAG_DISABLE_ALL_WRAP_SOURCES,
@@ -45,7 +44,7 @@ export function useSwapCallback(
     return async function onSwap() {
       const contract: Contract | null = isOneSplit
         ? getOneSplit(chainId, library, account)
-        : getMooniswapContract(chainId, library, trade.route.pairs[0].poolAddress, account)
+        : getMooniswapContract(chainId, library, trade.route.route[0].pairs[0].poolAddress, account)
       if (!contract) {
         throw new Error('Failed to get a swap contract')
       }
@@ -107,11 +106,10 @@ export function useSwapCallback(
           const inputAmount = trade.inputAmount.toSignificant(3)
           const outputAmount = trade.outputAmount.toSignificant(3)
 
-          const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
-          const withRecipient = base
+          // const withRecipient = base
 
-          const withVersion =
-            tradeVersion === Version.v2 ? withRecipient : `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`
+          const withVersion = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
+            // `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`
 
           addTransaction(response, {
             summary: withVersion
