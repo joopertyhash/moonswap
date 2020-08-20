@@ -46,6 +46,7 @@ import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
 import ReferralLink from '../../components/RefferalLink'
+import ChiDiscount from '../../components/ChiDiscount'
 
 export default function Swap() {
   useDefaultsFromURLSearch()
@@ -147,8 +148,43 @@ export default function Swap() {
     }
   }, [approval, approvalSubmitted])
 
+
+//   //
+//   const [txWithCHI, setTxWithCHI] = useState(false)
+//   const [txChiCostGwei, setTxChiCostGwei] = useState(NaN)
+//
+//   const doSwap = () => {}
+//
+//   useEffect(() => {
+//
+//     function handleEstimationResponse(status) {
+//       setIsOnline(status.isOnline);
+//     }
+//
+//     // doEstimation, assignCallback
+//     ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+//
+//
+//     // Specify how to clean up after this effect:
+//     return function cleanup() {
+//       ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+//     };
+//
+//   }, [tokenA, tokenB, amountA, amountB]);
+// //
+
+
+  // fromAmount: TokenAmount,
+  //   trade: Trade, // trade to execute, required
+  //   distribution: BigNumber[],
+  //   allowedSlippage: number, // in bips
+
   // the callback to execute the swap
-  const swapCallback = useSwapCallback(parsedAmount, trade, distribution, allowedSlippage)
+  const result = useSwapCallback({ fromAmount: parsedAmount, trade, distribution, allowedSlippage })
+  const swap = result?.swap;
+    // estimatePriceWithCHI,
+    // estimatePriceWithoutCHI
+
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
@@ -161,12 +197,14 @@ export default function Swap() {
     if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
       return
     }
-    if (!swapCallback) {
+
+    if (!swap) {
       return
     }
+
     setAttemptingTxn(true)
-    swapCallback()
-      .then(hash => {
+    swap()
+      .then((hash: string) => {
         setAttemptingTxn(false)
         setTxHash(hash)
 
@@ -180,7 +218,7 @@ export default function Swap() {
         //   ].join('/')
         // })
       })
-      .catch(error => {
+      .catch((error: any) => {
         setAttemptingTxn(false)
         // we only care if the error is something _other_ than the user rejected the tx
         if (error?.code !== 4001) {
@@ -423,6 +461,7 @@ export default function Swap() {
             {betterTradeLinkVersion && <BetterTradeLink version={betterTradeLinkVersion}/>}
           </BottomGrouping>
 
+          <ChiDiscount route={route}/>
           {account ? (<ReferralLink/>) : ('')}
 
         </Wrapper>

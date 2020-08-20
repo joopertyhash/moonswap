@@ -28,9 +28,11 @@ export function ChiStateControl({ state, approveCHI }) {
   }
 
   if (state === ApprovalState.PENDING) {
+    // TODO: pending icon - maybe change toggle to button activate CHI
+    // Enable CHI automatically after approval
     return (
       <>
-        'pending'
+        pending
       </>
     )
   }
