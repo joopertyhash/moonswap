@@ -46,6 +46,7 @@ import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
 import ReferralLink from '../../components/RefferalLink'
+import GasConsumption from '../../components/swap/GasConsumption'
 
 export default function Swap() {
   useDefaultsFromURLSearch()
@@ -336,6 +337,18 @@ export default function Swap() {
                       inputCurrency={currencies[Field.INPUT]}
                       outputCurrency={currencies[Field.OUTPUT]}
                       price={trade?.executionPrice}
+                      showInverted={showInverted}
+                      setShowInverted={setShowInverted}
+                    />
+                  </RowBetween>
+                  <RowBetween align="center">
+                    <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                      Gas consumption
+                    </Text>
+                    <GasConsumption
+                      gas={1000}
+                      gasWhenUseChi={640}
+                      outputCurrency={currencies[Field.OUTPUT]}
                       showInverted={showInverted}
                       setShowInverted={setShowInverted}
                     />
