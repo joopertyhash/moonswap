@@ -1,5 +1,4 @@
 import React from 'react'
-import { Token } from '@uniswap/sdk'
 import { useContext } from 'react'
 import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components'
@@ -8,9 +7,6 @@ import QuestionHelper from '../QuestionHelper'
 interface GasConsumptionProps {
   gas?: number
   gasWhenUseChi?: number
-  outputCurrency?: Token
-  showInverted: boolean
-  setShowInverted: (showInverted: boolean) => void
 }
 
 
@@ -22,15 +18,8 @@ const Text2 = styled(Text)<{ color?: string }>`
   font-size: 14;
   color: ${({ color, theme }) => (color ? color : theme.text2)}
 `
-// color={gasWhenUseChi ? theme.green1 : theme.text2}
 
-export default function GasConsumption({
-  gas,
-  gasWhenUseChi,
-  outputCurrency,
-  showInverted,
-  setShowInverted
-}: GasConsumptionProps) {
+export default function GasConsumption({ gas, gasWhenUseChi}: GasConsumptionProps) {
   const theme = useContext(ThemeContext)
 
   // const formattedPrice = showInverted ? price?.toSignificant(6) : price?.invert()?.toSignificant(6)
@@ -40,8 +29,9 @@ export default function GasConsumption({
   //   : `${inputCurrency?.symbol} per ${outputCurrency?.symbol}`
 
   // {/*theme.red1, theme.yellow2, theme.green1*/}
-  const ready = true;
-  const tooltipText = 'hi!!';
+
+  // const ready = true;
+  // const tooltipText = 'hi!!';
 
   // if(true){
   //   return (
@@ -69,7 +59,8 @@ export default function GasConsumption({
 
         <Text2 style={{marginLeft: '2px'}}>Gwei</Text2>
         <QuestionHelper
-          text="Your transaction will revert if there is a large, unfavorable price movement before it is confirmed." />
+          text="The burning of CHI token decreases Gas consumption.
+Metamask shows a higher gas estimation because it doesn't include gas return out of CHI token burn." />
       </div>
   )
 }

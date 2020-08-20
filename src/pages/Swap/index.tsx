@@ -345,13 +345,7 @@ export default function Swap() {
                     <Text fontWeight={500} fontSize={14} color={theme.text2}>
                       Gas consumption
                     </Text>
-                    <GasConsumption
-                      gas={1000}
-                      gasWhenUseChi={640}
-                      outputCurrency={currencies[Field.OUTPUT]}
-                      showInverted={showInverted}
-                      setShowInverted={setShowInverted}
-                    />
+                    <GasConsumption gas={1000} gasWhenUseChi={640}/>
                   </RowBetween>
 
                   {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (
