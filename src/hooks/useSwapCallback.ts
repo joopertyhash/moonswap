@@ -11,13 +11,19 @@ import { Version } from './useToggledVersion'
 import {
   FLAG_DISABLE_ALL_SPLIT_SOURCES,
   FLAG_DISABLE_ALL_WRAP_SOURCES,
-  FLAG_DISABLE_MOONISWAP_ALL
+  FLAG_DISABLE_MOONISWAP_ALL, FLAG_ENABLE_CHI_BURN
 } from '../constants/one-split'
 import { getAddress, isAddress } from '@ethersproject/address'
 
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
 // }
+
+const bitwiseOrOnJSBI = (...items: JSBI[]): JSBI => {
+  return items.reduce((acc, val) => {
+    return JSBI.add(acc, val)
+  }, JSBI.BigInt(0x0))
+}
 
 export type SwapCallback = null | (() => Promise<string>);
 export type EstimateCallback = null | (() => Promise<Array<number|undefined> | undefined>);
@@ -86,7 +92,6 @@ export function useEstimateCallback(
       value = BigNumber.from(fromAmount.raw.toString())
     }
 
-    const regularFlags = JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL));
 
     const estimateWithFlags = (flags: JSBI): Promise<number|undefined> => {
       const args: any[] = [
@@ -111,10 +116,18 @@ export function useEstimateCallback(
       return safeGasEstimate;
     }
 
+    const flags = [
+      FLAG_DISABLE_ALL_WRAP_SOURCES,
+      FLAG_DISABLE_ALL_SPLIT_SOURCES,
+      FLAG_DISABLE_MOONISWAP_ALL
+    ];
+
+    const regularFlags = bitwiseOrOnJSBI(...flags);
+    const chiFlags = bitwiseOrOnJSBI(...flags, FLAG_ENABLE_CHI_BURN);
     return () => {
       return Promise.all([
         estimateWithFlags(regularFlags),
-        estimateWithFlags(regularFlags)
+        estimateWithFlags(chiFlags)
       ]);
     }
   }, [
