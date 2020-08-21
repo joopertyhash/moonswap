@@ -150,10 +150,39 @@ export default function Swap() {
   }, [approval, approvalSubmitted])
 
   // the callback to execute the swap
-  const [isOneSplit, swapCallback] = useSwap(parsedAmount, trade, distribution, allowedSlippage)
+
+  const [isOneSplit, swapCallback, estimate] = useSwap(parsedAmount, trade, distribution, allowedSlippage)
+
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
+
   const [gas, setGas] = useState(1000)
   const [gasWhenUseChi, setGasWhenUseChi]  = useState(640)
+
+  const x = trade?.inputAmount?.toExact()
+
+  useEffect(() => {
+    let unmounted = false;
+
+    console.log(x);
+
+    function handleStatusChange() {
+      if(unmounted){
+        return
+      }
+      setGas(gas + 1);
+      setGasWhenUseChi(gasWhenUseChi + 1)
+      console.log('Assign');
+    }
+
+    x && estimate && estimate().then(() => handleStatusChange())
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      unmounted = true;
+    };
+
+    // eslint-disable-next-line
+  }, [x]);
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))

@@ -16,28 +16,57 @@ import {
 import { getAddress, isAddress } from '@ethersproject/address'
 
 
-
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
 // }
 
 export type SwapCallback = null | (() => Promise<string>);
+export type EstimateCallback = null | (() => Promise<number>);
+
+export type useSwapResult = [
+  boolean,
+  SwapCallback,
+  EstimateCallback
+]
 
 export function useSwap(
   fromAmount: TokenAmount | undefined,
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
-): (null | [boolean, SwapCallback]) {
+): useSwapResult {
 
-  const isOneSplit = isUseOneSplitContract(distribution)
-  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit);
-  return [isOneSplit, swapCallback];
+  return useMemo(() => {
+    const isOneSplit = isUseOneSplitContract(distribution)
+    //const swapCallback = useSwapCallback2(fromAmount, trade, distribution, allowedSlippage, isOneSplit);
+
+    const swapCallback = () => {
+      return Promise.resolve('1');
+    }
+
+    const estimate = () => {
+      // Fake estimate
+      const p$ = new Promise<number>((resolve) => {
+        setTimeout(() => {
+          resolve(1100)
+        }, 500)
+      });
+
+      p$.then(() => {
+        console.log('-B-');
+        // TODO: dispatch
+      });
+
+      return p$
+    };
+
+    return [isOneSplit, swapCallback, estimate];
+  }, [fromAmount, trade, distribution, allowedSlippage ])
 }
 
 // returns a function that will execute a swap, if the parameters are all valid
 // and the user has approved the slippage adjusted input amount for the trade
-export function useSwapCallback(
+export function useSwapCallback2(
   fromAmount: TokenAmount | undefined,
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
