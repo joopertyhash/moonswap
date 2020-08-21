@@ -20,7 +20,7 @@ import { getAddress, isAddress } from '@ethersproject/address'
 // }
 
 export type SwapCallback = null | (() => Promise<string>);
-export type EstimateCallback = null | (() => Promise<number | undefined>);
+export type EstimateCallback = null | (() => Promise<Array<number|undefined> | undefined>);
 
 export type useSwapResult = [
   boolean,
@@ -81,21 +81,23 @@ export function useEstimateCallback(
       return () => Promise.resolve(undefined)
     }
 
-    const args: any[] = [
-      trade.inputAmount.token.address,
-      trade.outputAmount.token.address,
-      fromAmount?.raw.toString(),
-      fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
-      distribution.map(x => x.toString()),
-      JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL)).toString()
-    ];
-
     let value: BigNumber | undefined
     if (trade.inputAmount.token.symbol === 'ETH') {
       value = BigNumber.from(fromAmount.raw.toString())
     }
 
-    return () => {
+    const regularFlags = JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL));
+
+    const estimateWithFlags = (flags: JSBI): Promise<number|undefined> => {
+      const args: any[] = [
+        trade.inputAmount.token.address,
+        trade.outputAmount.token.address,
+        fromAmount?.raw.toString(),
+        fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
+        distribution.map(x => x.toString()),
+        flags.toString()
+      ];
+
       const safeGasEstimate = contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
         .then((gas) => {
           const x = calculateGasMargin(gas)
@@ -105,7 +107,15 @@ export function useEstimateCallback(
           console.error(`estimateGas failed for ${'swap'}`, error)
           return undefined
         })
-      return safeGasEstimate
+
+      return safeGasEstimate;
+    }
+
+    return () => {
+      return Promise.all([
+        estimateWithFlags(regularFlags),
+        estimateWithFlags(regularFlags)
+      ]);
     }
   }, [
     trade,

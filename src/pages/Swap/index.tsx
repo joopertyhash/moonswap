@@ -165,15 +165,16 @@ export default function Swap() {
 
     console.log(x);
 
-    function handleStatusChange(result: any) {
+    function handleStatusChange(result: number[]) {
       // round
       if(unmounted){
         return
       }
 
-      const gwei = Math.round(result / 1000);
-      setGas(gwei);
-      setGasWhenUseChi(gwei)
+      const gas = Math.round(result[0] / 1000);
+      const gasWhenUseChi = Math.round(result[1] / 1000);
+      setGas(gas);
+      setGasWhenUseChi(gasWhenUseChi)
       console.log('Assign');
     }
 
