@@ -18,12 +18,11 @@ import SwapModalFooter from '../../components/swap/SwapModalFooter'
 import SwapModalHeader from '../../components/swap/SwapModalHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { TokenWarningCards } from '../../components/TokenWarningCard'
-
 import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { isTradeBetter } from '../../data/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
-import { useSwapCallback } from '../../hooks/useSwapCallback'
+import { useSwap } from '../../hooks/useSwapCallback'
 import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -66,6 +65,7 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue } = useSwapState()
+
   const { onSwitchTokens, onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const { v1Trade, v2Trade, mooniswapTrade, currencyBalances, parsedAmount, currencies, error } = useDerivedSwapInfo()
 
@@ -149,7 +149,10 @@ export default function Swap() {
   }, [approval, approvalSubmitted])
 
   // the callback to execute the swap
-  const swapCallback = useSwapCallback(parsedAmount, trade, distribution, allowedSlippage)
+  const [isOneSplit, swapCallback] = useSwap(parsedAmount, trade, distribution, allowedSlippage)
+  //
+  const [gas, setGas] = useState(1000)
+  const [gasWhenUseChi, setGasWhenUseChi]  = useState(640)
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
@@ -345,7 +348,11 @@ export default function Swap() {
                     <Text fontWeight={500} fontSize={14} color={theme.text2}>
                       Gas consumption
                     </Text>
-                    <GasConsumption gas={1000} gasWhenUseChi={640}/>
+                    {
+                      isOneSplit
+                        ? <GasConsumption gas={gas} gasWhenUseChi={gasWhenUseChi}/>
+                        : ('')
+                    }
                   </RowBetween>
 
                   {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (

@@ -21,18 +21,31 @@ import { getAddress, isAddress } from '@ethersproject/address'
 //   return /^0x0*$/.test(hexNumber)
 // }
 
+export type SwapCallback = null | (() => Promise<string>);
+
+export function useSwap(
+  fromAmount: TokenAmount | undefined,
+  trade: Trade | undefined, // trade to execute, required
+  distribution: BigNumber[] | undefined,
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
+): (null | [boolean, SwapCallback]) {
+
+  const isOneSplit = isUseOneSplitContract(distribution)
+  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit);
+  return [isOneSplit, swapCallback];
+}
+
 // returns a function that will execute a swap, if the parameters are all valid
 // and the user has approved the slippage adjusted input amount for the trade
 export function useSwapCallback(
   fromAmount: TokenAmount | undefined,
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
-  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
-): null | (() => Promise<string>) {
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips,
+  isOneSplit: boolean,
+): SwapCallback {
   const { account, chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
-
-  const isOneSplit = isUseOneSplitContract(distribution)
 
   const recipient = account
 
