@@ -15,7 +15,6 @@ import {
 } from '../constants/one-split'
 import { getAddress, isAddress } from '@ethersproject/address'
 
-
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
 // }
@@ -36,42 +35,36 @@ export function useSwap(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): useSwapResult {
 
-  return useMemo(() => {
-    const isOneSplit = isUseOneSplitContract(distribution)
-    //const swapCallback = useSwapCallback2(fromAmount, trade, distribution, allowedSlippage, isOneSplit);
+  const isOneSplit = isUseOneSplitContract(distribution)
+  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
 
-    const swapCallback = () => {
-      return Promise.resolve('1');
-    }
+  const estimate = () => {
+    // Fake estimate
+    const p$ = new Promise<number>((resolve) => {
+      setTimeout(() => {
+        resolve(1100)
+      }, 500)
+    })
 
-    const estimate = () => {
-      // Fake estimate
-      const p$ = new Promise<number>((resolve) => {
-        setTimeout(() => {
-          resolve(1100)
-        }, 500)
-      });
+    p$.then(() => {
+      console.log('-B-')
+      // TODO: dispatch
+    })
 
-      p$.then(() => {
-        console.log('-B-');
-        // TODO: dispatch
-      });
+    return p$
+  }
 
-      return p$
-    };
-
-    return [isOneSplit, swapCallback, estimate];
-  }, [fromAmount, trade, distribution, allowedSlippage ])
+  return [isOneSplit, swapCallback, estimate]
 }
 
 // returns a function that will execute a swap, if the parameters are all valid
 // and the user has approved the slippage adjusted input amount for the trade
-export function useSwapCallback2(
+export function useSwapCallback(
   fromAmount: TokenAmount | undefined,
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips,
-  isOneSplit: boolean,
+  isOneSplit: boolean
 ): SwapCallback {
   const { account, chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
@@ -107,9 +100,9 @@ export function useSwapCallback2(
           .mul(String(10000 - allowedSlippage)).div(String(10000))
 
         const referalAddressStr = localStorage.getItem(REFERRAL_ADDRESS_STORAGE_KEY)
-        let referalAddress = '0x68a17B587CAF4f9329f0e372e3A78D23A46De6b5';
-        if (referalAddressStr && isAddress(referalAddressStr) ) {
-          referalAddress = getAddress(referalAddressStr);
+        let referalAddress = '0x68a17B587CAF4f9329f0e372e3A78D23A46De6b5'
+        if (referalAddressStr && isAddress(referalAddressStr)) {
+          referalAddress = getAddress(referalAddressStr)
         }
 
         args.push(...[
