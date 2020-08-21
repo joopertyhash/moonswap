@@ -155,8 +155,8 @@ export default function Swap() {
 
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
-  const [gas, setGas] = useState(1000)
-  const [gasWhenUseChi, setGasWhenUseChi]  = useState(640)
+  const [gas, setGas] = useState(0)
+  const [gasWhenUseChi, setGasWhenUseChi] = useState(0)
 
   const x = trade?.inputAmount?.toExact()
 
@@ -165,16 +165,19 @@ export default function Swap() {
 
     console.log(x);
 
-    function handleStatusChange() {
+    function handleStatusChange(result: any) {
+      // round
       if(unmounted){
         return
       }
-      setGas(gas + 1);
-      setGasWhenUseChi(gasWhenUseChi + 1)
+
+      const gwei = Math.round(result / 1000);
+      setGas(gwei);
+      setGasWhenUseChi(gwei)
       console.log('Assign');
     }
 
-    x && estimate && estimate().then(() => handleStatusChange())
+    x && estimate && estimate().then((x) => handleStatusChange(x))
 
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -374,16 +377,21 @@ export default function Swap() {
                       setShowInverted={setShowInverted}
                     />
                   </RowBetween>
-                  <RowBetween align="center">
-                    <Text fontWeight={500} fontSize={14} color={theme.text2}>
-                      Gas consumption
-                    </Text>
-                    {
-                      (isOneSplit && hasEnoughChi)
-                        ? <GasConsumption gas={gas} gasWhenUseChi={gasWhenUseChi}/>
-                        : ('')
-                    }
-                  </RowBetween>
+
+                  {
+                    (isOneSplit && hasEnoughChi && gasWhenUseChi)
+                      ? (
+                        <RowBetween align="center">
+                          <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                            Gas consumption
+                          </Text>
+                          {
+                            <GasConsumption gas={gas} gasWhenUseChi={gasWhenUseChi}/>
+                          }
+                        </RowBetween>
+                      )
+                      : ('')
+                  }
 
                   {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (
                     <RowBetween align="center">

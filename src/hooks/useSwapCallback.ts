@@ -20,7 +20,7 @@ import { getAddress, isAddress } from '@ethersproject/address'
 // }
 
 export type SwapCallback = null | (() => Promise<string>);
-export type EstimateCallback = null | (() => Promise<number>);
+export type EstimateCallback = null | (() => Promise<number | undefined>);
 
 export type useSwapResult = [
   boolean,
@@ -37,24 +37,87 @@ export function useSwap(
 
   const isOneSplit = isUseOneSplitContract(distribution)
   const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
+  const estimate = useEstimateCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
 
-  const estimate = () => {
-    // Fake estimate
-    const p$ = new Promise<number>((resolve) => {
-      setTimeout(() => {
-        resolve(1100)
-      }, 500)
-    })
-
-    p$.then(() => {
-      console.log('-B-')
-      // TODO: dispatch
-    })
-
-    return p$
-  }
+  // const estimate = () => {
+  //   // Fake estimate
+  //   const p$ = new Promise<number>((resolve) => {
+  //     setTimeout(() => {
+  //       resolve(1100)
+  //     }, 500)
+  //   })
+  //
+  //   p$.then(() => {
+  //     console.log('-B-')
+  //     // TODO: dispatch
+  //   })
+  //
+  //   return p$
+  // }
 
   return [isOneSplit, swapCallback, estimate]
+}
+
+
+export function useEstimateCallback(
+  fromAmount: TokenAmount | undefined,
+  trade: Trade | undefined, // trade to execute, required
+  distribution: BigNumber[] | undefined,
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips,
+  isOneSplit: boolean
+): EstimateCallback {
+
+  const { account, chainId, library } = useActiveWeb3React()
+  const recipient = account
+
+  const tradeVersion = getTradeVersion(trade)
+
+  return useMemo(() => {
+    if (!trade || !recipient || !library || !account || !tradeVersion || !chainId || !distribution || !fromAmount)
+      return () => Promise.resolve(undefined)
+
+    const contract: Contract | null = getOneSplit(chainId, library, account)
+    if (!isOneSplit) {
+      return () => Promise.resolve(undefined)
+    }
+
+    const args: any[] = [
+      trade.inputAmount.token.address,
+      trade.outputAmount.token.address,
+      fromAmount?.raw.toString(),
+      fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
+      distribution.map(x => x.toString()),
+      JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL)).toString()
+    ];
+
+    let value: BigNumber | undefined
+    if (trade.inputAmount.token.symbol === 'ETH') {
+      value = BigNumber.from(fromAmount.raw.toString())
+    }
+
+    return () => {
+      const safeGasEstimate = contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
+        .then((gas) => {
+          const x = calculateGasMargin(gas)
+          return x.toNumber()
+        })
+        .catch(error => {
+          console.error(`estimateGas failed for ${'swap'}`, error)
+          return undefined
+        })
+      return safeGasEstimate
+    }
+  }, [
+    trade,
+    recipient,
+    library,
+    account,
+    tradeVersion,
+    chainId,
+    allowedSlippage,
+    distribution,
+    fromAmount,
+    isOneSplit])
 }
 
 // returns a function that will execute a swap, if the parameters are all valid
