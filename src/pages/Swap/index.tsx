@@ -46,6 +46,7 @@ import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
 import ReferralLink from '../../components/RefferalLink'
 import GasConsumption from '../../components/swap/GasConsumption'
+import { MIN_CHI_BALANCE, useHasChi } from '../../hooks/useChi'
 
 export default function Swap() {
   useDefaultsFromURLSearch()
@@ -150,7 +151,7 @@ export default function Swap() {
 
   // the callback to execute the swap
   const [isOneSplit, swapCallback] = useSwap(parsedAmount, trade, distribution, allowedSlippage)
-  //
+  const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
   const [gas, setGas] = useState(1000)
   const [gasWhenUseChi, setGasWhenUseChi]  = useState(640)
 
@@ -349,7 +350,7 @@ export default function Swap() {
                       Gas consumption
                     </Text>
                     {
-                      isOneSplit
+                      (isOneSplit && hasEnoughChi)
                         ? <GasConsumption gas={gas} gasWhenUseChi={gasWhenUseChi}/>
                         : ('')
                     }

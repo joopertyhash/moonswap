@@ -4,6 +4,8 @@ import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useActiveWeb3React } from './index'
 import { useChiController } from './useContract'
 
+export const MIN_CHI_BALANCE = 5;
+
 export default function useChiBalance(): JSBI | undefined {
   const { account } = useActiveWeb3React()
   const chiContract = useChiController()

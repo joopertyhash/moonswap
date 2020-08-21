@@ -23,7 +23,7 @@ import { injected, walletconnect, walletlink, fortmatic, portis } from '../../co
 import Loader from '../Loader'
 import ChiIcon from '../../assets/images/chi.png'
 import { MouseoverTooltip } from '../Tooltip'
-import  { useHasChi } from '../../hooks/useChi'
+import { MIN_CHI_BALANCE, useHasChi } from '../../hooks/useChi'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { TokenAmount } from '@uniswap/sdk'
 import { ONE_SPLIT_ADDRESSES } from '../../constants/one-split'
@@ -135,7 +135,6 @@ function recentTransactionsOnly(a: TransactionDetails) {
 function ChiComponent() {
 
   const { chainId } = useWeb3React()
-  const MIN_CHI_BALANCE = 5
   const hasChi = useHasChi(0)
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
