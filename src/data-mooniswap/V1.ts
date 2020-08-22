@@ -236,7 +236,7 @@ export function useMooniswapTrade(
   if (!distribution[12].isZero() && poolPair[1]) {
     pairs.push(poolPair[1])
   }
-debugger
+
   if (pairs.length === 0) {
     return
   }
