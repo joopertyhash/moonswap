@@ -211,7 +211,7 @@ export function useMooniswapTrade(
 
   const poolPairUsdcToDest = usePair(USDC, outputCurrency)
   const poolPairDaiToDest = usePair(DAI, outputCurrency)
-  const poolPairEthToDest = usePair(USDC, outputCurrency)
+  const poolPairEthToDest = usePair(ETHER, outputCurrency)
 
   const results = useSingleCallResult(useOneSplit(), 'getExpectedReturn', params)
   if(!inputCurrency || !outputCurrency || !parseAmount || !results.result) {
@@ -236,7 +236,7 @@ export function useMooniswapTrade(
   if (!distribution[12].isZero() && poolPair[1]) {
     pairs.push(poolPair[1])
   }
-
+debugger
   if (pairs.length === 0) {
     return
   }
