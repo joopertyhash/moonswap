@@ -46,7 +46,6 @@ import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
 import ReferralLink from '../../components/RefferalLink'
 import GasConsumption from '../../components/swap/GasConsumption'
-import { MIN_CHI_BALANCE, useHasChi } from '../../hooks/useChi'
 
 export default function Swap() {
   useDefaultsFromURLSearch()
@@ -149,21 +148,18 @@ export default function Swap() {
     }
   }, [approval, approvalSubmitted])
 
-  // the callback to execute the swap
-
-  const [isOneSplit, swapCallback, estimate] = useSwap(parsedAmount, trade, distribution, allowedSlippage)
-
-  const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
   const [gas, setGas] = useState(0)
   const [gasWhenUseChi, setGasWhenUseChi] = useState(0)
 
+  // the callback to execute the swap
+  const [isChiApplied, swapCallback, estimate] = useSwap(chainId, parsedAmount, trade, distribution, allowedSlippage)
+
   const x = trade?.inputAmount?.toExact()
 
+  // TODO: for sure should be more elegant solution for estimation calls
   useEffect(() => {
     let unmounted = false;
-
-    console.log(x);
 
     function handleStatusChange(result: number[]) {
       // round
@@ -171,11 +167,17 @@ export default function Swap() {
         return
       }
 
-      const gas = Math.round(result[0] / 1000);
-      const gasWhenUseChi = Math.round(result[1] / 1000);
+      const gasWithoutChi = result[0];
+      const gasWithChi = result[1];
+
+      // As base gas amount on UI show the same amount of gas that metamask would show (red one)
+      const gas = Math.round(gasWithChi / 1000);
+
+      // Chi allow to safe up to 43% from original transaction (the one without CHI burn) green
+      const gasWhenUseChi = Math.round(gasWithoutChi * 0.57 / 1000);
+      //
       setGas(gas);
       setGasWhenUseChi(gasWhenUseChi)
-      console.log('Assign');
     }
 
     x && estimate && estimate().then((x) => handleStatusChange(x))
@@ -380,7 +382,7 @@ export default function Swap() {
                   </RowBetween>
 
                   {
-                    (isOneSplit && hasEnoughChi && gasWhenUseChi)
+                    (isChiApplied)
                       ? (
                         <RowBetween align="center">
                           <Text fontWeight={500} fontSize={14} color={theme.text2}>

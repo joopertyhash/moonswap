@@ -1,8 +1,12 @@
-import { JSBI } from '@uniswap/sdk'
+import { ChainId, JSBI, TokenAmount } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useActiveWeb3React } from './index'
 import { useChiController } from './useContract'
+import { ApprovalState, useApproveCallback } from './useApproveCallback'
+import { CHI } from '../constants'
+import { MaxUint256 } from '@ethersproject/constants'
+import { ONE_SPLIT_ADDRESSES } from '../constants/one-split'
 
 export const MIN_CHI_BALANCE = 5;
 
@@ -18,4 +22,11 @@ export default function useChiBalance(): JSBI | undefined {
 export function useHasChi(minAmount: number): boolean | undefined {
   const balance = useChiBalance()
   return useMemo(() => balance && JSBI.greaterThan(balance, JSBI.BigInt(minAmount)), [balance, minAmount])
+}
+
+export function useIsChiApproved(chainId: ChainId): [ApprovalState, () => Promise<void>] {
+  return useApproveCallback(
+    new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
+    ONE_SPLIT_ADDRESSES[chainId]
+  )
 }

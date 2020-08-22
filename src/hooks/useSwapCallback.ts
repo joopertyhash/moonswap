@@ -11,9 +11,11 @@ import { Version } from './useToggledVersion'
 import {
   FLAG_DISABLE_ALL_SPLIT_SOURCES,
   FLAG_DISABLE_ALL_WRAP_SOURCES,
-  FLAG_DISABLE_MOONISWAP_ALL, FLAG_ENABLE_CHI_BURN
+  FLAG_DISABLE_MOONISWAP_ALL, FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN
 } from '../constants/one-split'
 import { getAddress, isAddress } from '@ethersproject/address'
+import { MIN_CHI_BALANCE, useHasChi, useIsChiApproved } from './useChi'
+import { ApprovalState } from './useApproveCallback'
 
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
@@ -35,33 +37,23 @@ export type useSwapResult = [
 ]
 
 export function useSwap(
+  chainId: number | undefined,
   fromAmount: TokenAmount | undefined,
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): useSwapResult {
 
+
   const isOneSplit = isUseOneSplitContract(distribution)
-  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
+  const [isChiApproved] = useIsChiApproved(chainId || 0)
+  const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
+  const applyChi = !!(isOneSplit && (isChiApproved === ApprovalState.APPROVED) && hasEnoughChi);
+
   const estimate = useEstimateCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
+  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit, applyChi)
 
-  // const estimate = () => {
-  //   // Fake estimate
-  //   const p$ = new Promise<number>((resolve) => {
-  //     setTimeout(() => {
-  //       resolve(1100)
-  //     }, 500)
-  //   })
-  //
-  //   p$.then(() => {
-  //     console.log('-B-')
-  //     // TODO: dispatch
-  //   })
-  //
-  //   return p$
-  // }
-
-  return [isOneSplit, swapCallback, estimate]
+  return [applyChi, swapCallback, estimate]
 }
 
 
@@ -123,7 +115,11 @@ export function useEstimateCallback(
     ];
 
     const regularFlags = bitwiseOrOnJSBI(...flags);
-    const chiFlags = bitwiseOrOnJSBI(...flags, FLAG_ENABLE_CHI_BURN);
+    console.log(`regular=`,regularFlags.toString(16));
+
+    const chiFlags = bitwiseOrOnJSBI(...flags, ...[FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN]);
+    console.log(`chi=`, chiFlags.toString(16));
+
     return () => {
       return Promise.all([
         estimateWithFlags(regularFlags),
@@ -150,7 +146,8 @@ export function useSwapCallback(
   trade: Trade | undefined, // trade to execute, required
   distribution: BigNumber[] | undefined,
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips,
-  isOneSplit: boolean
+  isOneSplit: boolean,
+  useChi: boolean | undefined
 ): SwapCallback {
   const { account, chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
@@ -164,23 +161,37 @@ export function useSwapCallback(
     if (!trade || !recipient || !library || !account || !tradeVersion || !chainId || !distribution || !fromAmount) return null
 
     return async function onSwap() {
+
       const contract: Contract | null = isOneSplit
         ? getOneSplit(chainId, library, account)
         : getMooniswapContract(chainId, library, trade.route.pairs[0].poolAddress, account)
+
       if (!contract) {
         throw new Error('Failed to get a swap contract')
       }
 
       const args: any[] = []
       if (isOneSplit) {
+
+        const flags = [
+          FLAG_DISABLE_ALL_WRAP_SOURCES,
+          FLAG_DISABLE_ALL_SPLIT_SOURCES,
+          FLAG_DISABLE_MOONISWAP_ALL,
+          useChi ? FLAG_ENABLE_CHI_BURN : JSBI.BigInt(0),
+          useChi ? FLAG_ENABLE_CHI_BURN_BY_ORIGIN : JSBI.BigInt(0)
+        ];
+
         args.push(...[
           trade.inputAmount.token.address,
           trade.outputAmount.token.address,
           fromAmount?.raw.toString(),
           fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
           distribution.map(x => x.toString()),
-          JSBI.add(FLAG_DISABLE_ALL_WRAP_SOURCES, JSBI.add(FLAG_DISABLE_ALL_SPLIT_SOURCES, FLAG_DISABLE_MOONISWAP_ALL)).toString()
+          bitwiseOrOnJSBI(...flags).toString()
         ])
+        //
+        // console.log('flags send=', bitwiseOrOnJSBI(...flags).toString(16))
+        //
       } else {
         const minReturn = BigNumber.from(trade.outputAmount.raw.toString())
           .mul(String(10000 - allowedSlippage)).div(String(10000))
@@ -263,6 +274,7 @@ export function useSwapCallback(
     addTransaction,
     distribution,
     fromAmount,
-    isOneSplit
+    isOneSplit,
+    useChi
   ])
 }

@@ -1,11 +1,6 @@
 import { useWeb3React } from '@web3-react/core'
-import { useHasChi } from '../../hooks/useChi'
-import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { TokenAmount } from '@uniswap/sdk'
-import { CHI } from '../../constants'
-import JSBI from 'jsbi'
-import { MaxUint256 } from '@ethersproject/constants'
-import { ONE_SPLIT_ADDRESSES } from '../../constants/one-split'
+import { useHasChi, useIsChiApproved } from '../../hooks/useChi'
+import { ApprovalState } from '../../hooks/useApproveCallback'
 import React, { useContext } from 'react'
 import { RowBetween, RowFixed } from '../Row'
 import { TYPE } from '../../theme'
@@ -49,13 +44,8 @@ export function ChiStateControl({ state, approveCHI }) {
 export function ChiRow() {
 
   const { chainId } = useWeb3React()
-  // const MIN_CHI_BALANCE = 5
   const hasChi = useHasChi(0)
-
-  const [approvalState, approveCHI] = useApproveCallback(
-    new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
-    ONE_SPLIT_ADDRESSES[chainId]
-  )
+  const [approvalState, approveCHI] = useIsChiApproved(chainId);
 
   const theme = useContext(ThemeContext)
 
