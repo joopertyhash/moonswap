@@ -156,6 +156,16 @@ export function useMooniswapTrade(
 
   const poolPair = usePair(inputCurrency, outputCurrency)
 
+  const path: RoutePath = []
+  if (poolPair[1]) {
+    const subPath: RouteSplit = {
+      pairs: [poolPair[1]],
+      percent: new Percent(JSBI.BigInt(100))
+    };
+    path.push(subPath)
+  }
+
+
   // const poolPairOverEth = usePair(inputCurrency, ETHER)
   // const poolPairOverDai = usePair(inputCurrency, DAI)
   // const poolPairOverUsdc = usePair(inputCurrency, USDC)
@@ -165,13 +175,30 @@ export function useMooniswapTrade(
   // const poolPairEthToDest = usePair(USDC, outputCurrency)
 
   const results = useSingleCallResult(useOneSplit(), 'getExpectedReturn', params)
-  if(!inputCurrency || !outputCurrency || !parseAmount || !results.result) {
+  if(!inputCurrency || !outputCurrency || !parseAmount) {
     return
   }
 
-  const distribution = results.result.distribution
+  if (!results.result && poolPair[1]) {
+    const exactAmount = parseAmount
+    const exactOutput = poolPair[1].getOutputAmount(exactAmount)[0]
 
-  const path: RoutePath = []
+    const route = inputCurrency && path && path.length > 0 && new Route(path, inputCurrency, outputCurrency)
+    try {
+      mooniswapTrade =
+        route && exactAmount
+          ? new Trade(route, exactAmount, TradeType.EXACT_OUTPUT, exactOutput)
+          : undefined
+    } catch (error) {
+      console.error('Failed to create mooniswapTrade trade', error)
+    }
+    return [mooniswapTrade, []]
+  } else if (!poolPair[1] || !results.result) {
+    return
+  }
+
+  // const distribution = results.result.distribution
+
   // if (!distribution[31].isZero() && poolPairOverEth[1] && poolPairEthToDest[1]) {
   //   const subPath: RouteSplit = {
   //     pairs: [poolPairOverEth[1], poolPairEthToDest[1]],
@@ -194,13 +221,6 @@ export function useMooniswapTrade(
   //   path.push(subPath)
   // }
   // if (!distribution[12].isZero() && poolPair[1]) {
-  if (poolPair[1]) {
-    const subPath: RouteSplit = {
-      pairs: [poolPair[1]],
-      percent: new Percent(JSBI.BigInt(distribution[12]))
-    };
-    path.push(subPath)
-  }
 
   if (path.length === 0) {
     return
