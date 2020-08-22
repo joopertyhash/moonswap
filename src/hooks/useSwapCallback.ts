@@ -23,7 +23,7 @@ import { ApprovalState } from './useApproveCallback'
 
 const bitwiseOrOnJSBI = (...items: JSBI[]): JSBI => {
   return items.reduce((acc, val) => {
-    return JSBI.add(acc, val)
+    return JSBI.bitwiseOr(acc, val)
   }, JSBI.BigInt(0x0))
 }
 
@@ -117,7 +117,11 @@ export function useEstimateCallback(
     const regularFlags = bitwiseOrOnJSBI(...flags);
     console.log(`regular=`,regularFlags.toString(16));
 
-    const chiFlags = bitwiseOrOnJSBI(...flags, ...[FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN]);
+    const chiFlags = bitwiseOrOnJSBI(
+      ...flags,
+      ...[FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN]
+    );
+
     console.log(`chi=`, chiFlags.toString(16));
 
     return () => {
