@@ -17,6 +17,7 @@ import { useActiveWeb3React } from './index'
 import { ONE_SPLIT_ABI, ONE_SPLIT_ADDRESSES } from '../constants/one-split'
 import { UNISWAP_V2_HELPER_ABI, UNISWAP_V2_HELPER_ADDRESS } from '../constants/abis/uniswap-v2-helper'
 import { UNISWAP_V2_PAIR } from '../constants/abis/uniswap-v2-pair'
+import { UNISWAP_V2_FACTORY_ABI, UNISWAP_V2_FACTORY_ADDRESS } from '../constants/abis/uniswap-v2-factory'
 
 // returns null on errors
 function useContract(address?: string, ABI?: any, withSignerIfPossible = true): Contract | null {
@@ -50,7 +51,7 @@ export function useUniswapV2PairContract(pairAddress: string | undefined): Contr
 
 export function useUniswapV2FactoryContract(): Contract | null {
   const { chainId } = useActiveWeb3React()
-  return useContract(chainId && V1_FACTORY_ADDRESSES[chainId], V1_FACTORY_ABI, false)
+  return useContract(chainId && UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_V2_FACTORY_ABI, false)
 }
 
 export function useMooniswapMigratorContract(): Contract | null {

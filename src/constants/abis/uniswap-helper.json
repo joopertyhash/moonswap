@@ -6,6 +6,16 @@
         "internalType": "address",
         "name": "wallet",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fromIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "toIndex",
+        "type": "uint256"
       }
     ],
     "name": "getAllPairsWithBalances",
