@@ -23,12 +23,19 @@ import { useMooniswapMigratorContract } from '../../hooks/useContract'
 import { useIsTransactionPending, useTransactionAdder } from '../../state/transactions/hooks'
 import { useETHBalances, useTokenBalance, useTokenBalances } from '../../state/wallet/hooks'
 import { BackArrow, ExternalLink, TYPE } from '../../theme'
-import { getEtherscanLink, isAddress } from '../../utils'
+import {
+  calculateSlippageAmount,
+  getContract,
+  getEtherscanLink,
+  getMooniswapMigratorContract,
+  isAddress
+} from '../../utils'
 import { BodyWrapper } from '../AppBody'
 import { EmptyState } from './EmptyState'
 import { usePairTokens } from '../../data-mooniswap/UniswapV2'
 import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import { Link } from 'react-router-dom'
+import { useUserSlippageTolerance } from '../../state/user/hooks'
 
 const POOL_CURRENCY_AMOUNT_MIN = new Fraction(JSBI.BigInt(1), JSBI.BigInt(1000000))
 const WEI_DENOM = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
@@ -108,9 +115,10 @@ export function V1LiquidityInfo({
 }
 
 function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTokenAmount: TokenAmount; token0: Token, token1: Token }) {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId, library } = useActiveWeb3React()
   const totalSupply = useTotalSupply(liquidityTokenAmount.token)
   const pairTokenBalances = useTokenBalances(liquidityTokenAmount.token.address, [token0, token1])
+  const [allowedSlippage] = useUserSlippageTolerance()
 
   let mooniswapTokens = []
   if (token0.address === weth) {
@@ -166,10 +174,24 @@ function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTo
   const migrator = useMooniswapMigratorContract()
 
   let toPairAddress = mooniswapPair?.poolAddress
-  const migrate = useCallback(() => {
+  const migrate = useCallback(async () => {
 
     // if (!mooniswapPair || !minAmountToken || !minAmountETH) return
-    if (!toPairAddress) return
+    if (!toPairAddress || !allowedSlippage) return
+
+    const contract = getMooniswapMigratorContract(chainId, library, account)
+    const res = await contract.getExpectedReturn(
+      liquidityTokenAmount.token.address,
+      toPairAddress,
+      '0x' + liquidityTokenAmount.raw.toString(16),
+      '1', // set normal amount
+      '0x0'
+    )
+
+    const minReturn = calculateSlippageAmount(
+      new TokenAmount(mooniswapPair.liquidityToken, res.returnAmount),
+      allowedSlippage
+    )[0]
 
     setConfirmingMigration(true)
     migrator
@@ -177,7 +199,7 @@ function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTo
         liquidityTokenAmount.token.address,
         toPairAddress,
         '0x' + liquidityTokenAmount.raw.toString(16),
-        '0x0', // set normal amount
+        '0x' + minReturn.toString(16), // set normal amount
         new Array(34).fill(0),
         '0x0'
       )
