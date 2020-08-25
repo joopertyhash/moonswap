@@ -46,16 +46,16 @@ export default function MigrateV1() {
   for (let i = 0; i < uniswapV2Pairs.length; i++) {
     const pair = uniswapV2Pairs[i]
 
-    if (!allTokens[pair.token0]) {
-      if (pair.token0.toLowerCase() === token.address.toLowerCase()) {
+    if (!allTokens?.[pair?.token0]) {
+      if (pair?.token0?.toLowerCase() === token?.address?.toLowerCase()) {
         pair.token0 = token.address
       } else {
         continue;
       }
     }
 
-    if (!allTokens[pair.token1]) {
-      if (pair.token1.toLowerCase() === token.address.toLowerCase()) {
+    if (!allTokens?.[pair?.token1]) {
+      if (pair?.token1?.toLowerCase() === token?.address?.toLowerCase()) {
         pair.token1 = token.address
       } else {
         continue;
