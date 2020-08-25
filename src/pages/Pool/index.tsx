@@ -11,7 +11,7 @@ import { StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween } from '../../components/Row'
-import { ButtonPrimary } from '../../components/Button'
+import { ButtonPrimary, ButtonSecondary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
@@ -118,7 +118,7 @@ export default function Pool() {
             <div>
               <Text textAlign="center" fontSize={14} style={{ padding: '.5rem 0 .5rem 0' }}>
                 {'Don\'t see a pool you joined?'}{' '}
-                <StyledInternalLink id="import-pool-link" to={false ? '/migrate/v1' : '/find'}>
+                <StyledInternalLink id="import-pool-link" to={false ? '/migrate' : '/find'}>
                   {'Import it.'}
                 </StyledInternalLink>
               </Text>
@@ -129,6 +129,11 @@ export default function Pool() {
         </AutoColumn>
       </AppBody>
 
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '1.5rem' }}>
+        <ButtonSecondary as={Link} style={{ width: 'initial' }} to="/migrate">
+          Migrate Liquidity to Mooniswap
+        </ButtonSecondary>
+      </div>
     </>
   )
 }
