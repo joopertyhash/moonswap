@@ -1,8 +1,7 @@
 import { useUniswapV2HelperContract, useUniswapV2PairContract } from '../hooks/useContract'
 import { useMemo } from 'react'
-import { NEVER_RELOAD, useSingleCallResult, useSingleContractMultipleData } from '../state/multicall/hooks'
+import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { BigNumber } from '@ethersproject/bignumber'
-import { Token } from '@uniswap/sdk'
 
 export interface UniswapV2Pair {
   pair: string
@@ -32,7 +31,7 @@ export function useAllUniswapV2Pairs(account: string): [UniswapV2Pair[], boolean
 
       return [data || [], res?.loading]
     },
-    [account, res]
+    [res]
   )
 }
 
@@ -48,5 +47,5 @@ export function usePairTokens(pairAddress: string | undefined): string[] {
     }
     return []
   },
-  [contract, res0, res1])
+  [res0, res1])
 }

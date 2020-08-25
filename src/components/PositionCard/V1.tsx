@@ -8,7 +8,6 @@ import { ButtonSecondary } from '../Button'
 import { RowBetween, RowFixed } from '../Row'
 import { FixedHeightRow, HoverCard } from './index'
 import DoubleCurrencyLogo from '../DoubleLogo'
-import { useActiveWeb3React } from '../../hooks'
 import { ThemeContext } from 'styled-components'
 
 interface PositionCardProps extends RouteComponentProps<{}> {
@@ -19,8 +18,6 @@ interface PositionCardProps extends RouteComponentProps<{}> {
 
 function UniV2PositionCard({ token0, token1, V1LiquidityBalance }: PositionCardProps) {
   const theme = useContext(ThemeContext)
-
-  const { chainId } = useActiveWeb3React()
 
   return (
     <HoverCard>

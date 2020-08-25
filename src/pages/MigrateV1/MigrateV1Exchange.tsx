@@ -5,14 +5,13 @@ import React, { useCallback, useMemo, useState } from 'react'
 import ReactGA from 'react-ga'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { Text } from 'rebass'
-import { ButtonConfirmed, ButtonPrimary, ButtonSecondary } from '../../components/Button'
+import { ButtonConfirmed, ButtonPrimary } from '../../components/Button'
 import { LightCard, PinkCard, YellowCard } from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
 import CurrencyLogo from '../../components/CurrencyLogo'
 import QuestionHelper from '../../components/QuestionHelper'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Dots } from '../../components/swap/styleds'
-import { DEFAULT_DEADLINE_FROM_NOW, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { MIGRATOR_ADDRESS } from '../../constants/abis/migrator'
 import { PairState, usePair } from '../../data-mooniswap/Reserves'
 import { useTotalSupply } from '../../data-mooniswap/TotalSupply'
@@ -21,12 +20,10 @@ import { useToken } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useMooniswapMigratorContract } from '../../hooks/useContract'
 import { useIsTransactionPending, useTransactionAdder } from '../../state/transactions/hooks'
-import { useETHBalances, useTokenBalance, useTokenBalances } from '../../state/wallet/hooks'
-import { BackArrow, ExternalLink, TYPE } from '../../theme'
+import { useTokenBalance, useTokenBalances } from '../../state/wallet/hooks'
+import { BackArrow, TYPE } from '../../theme'
 import {
   calculateSlippageAmount,
-  getContract,
-  getEtherscanLink,
   getMooniswapMigratorContract,
   isAddress
 } from '../../utils'
@@ -38,11 +35,9 @@ import { Link } from 'react-router-dom'
 import { useUserSlippageTolerance } from '../../state/user/hooks'
 
 const POOL_CURRENCY_AMOUNT_MIN = new Fraction(JSBI.BigInt(1), JSBI.BigInt(1000000))
-const WEI_DENOM = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
 const ZERO = JSBI.BigInt(0)
 const ONE = JSBI.BigInt(1)
 const ZERO_FRACTION = new Fraction(ZERO, ONE)
-const ALLOWED_OUTPUT_MIN_PERCENT = new Percent(JSBI.BigInt(10000 - INITIAL_ALLOWED_SLIPPAGE), JSBI.BigInt(10000))
 const weth = isAddress('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2')
 
 function getDenom(decimals: number): JSBI {
@@ -173,16 +168,15 @@ function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTo
 
   const migrator = useMooniswapMigratorContract()
 
-  let toPairAddress = mooniswapPair?.poolAddress
   const migrate = useCallback(async () => {
 
     // if (!mooniswapPair || !minAmountToken || !minAmountETH) return
-    if (!toPairAddress || !allowedSlippage) return
+    if (!mooniswapPair || !allowedSlippage) return
 
     const contract = getMooniswapMigratorContract(chainId, library, account)
     const res = await contract.getExpectedReturn(
       liquidityTokenAmount.token.address,
-      toPairAddress,
+      mooniswapPair.poolAddress,
       '0x' + liquidityTokenAmount.raw.toString(16),
       '1', // set normal amount
       '0x0'
@@ -197,9 +191,9 @@ function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTo
     migrator
       .swap(
         liquidityTokenAmount.token.address,
-        toPairAddress,
+        mooniswapPair.poolAddress,
         '0x' + liquidityTokenAmount.raw.toString(16),
-        '0x' + minReturn.toString(16), // set normal amount
+        '0x' + minReturn.toString(16),
         new Array(34).fill(0),
         '0x0'
       )
@@ -220,7 +214,7 @@ function V1PairMigration({ liquidityTokenAmount, token0, token1 }: { liquidityTo
         console.log(e)
         setConfirmingMigration(false)
       })
-  }, [toPairAddress, migrator, token0, token1, account, addTransaction])
+  }, [allowedSlippage, chainId, library, liquidityTokenAmount, mooniswapPair, migrator, token0, token1, account, addTransaction])
 
   const noLiquidityTokens = !!liquidityTokenAmount && liquidityTokenAmount.equalTo(ZERO)
 
