@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { INITIAL_ALLOWED_SLIPPAGE, REFERRAL_ADDRESS_STORAGE_KEY } from '../constants'
 import { getTradeVersion } from '../data/V1'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getMooniswapContract, getOneSplit, isUseOneSplitContract } from '../utils'
+import { calculateGasMargin, getMooniswapContract, getOneSplit, isAddress, isUseOneSplitContract } from '../utils'
 import { useActiveWeb3React } from './index'
 import { Version } from './useToggledVersion'
 import {
@@ -13,9 +13,9 @@ import {
   FLAG_DISABLE_ALL_WRAP_SOURCES,
   FLAG_DISABLE_MOONISWAP_ALL, FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN
 } from '../constants/one-split'
-import { getAddress, isAddress } from '@ethersproject/address'
 import { MIN_CHI_BALANCE, useHasChi, useIsChiApproved } from './useChi'
 import { ApprovalState } from './useApproveCallback'
+import { getAddress } from '@ethersproject/address'
 
 // function isZero(hexNumber: string) {
 //   return /^0x0*$/.test(hexNumber)
@@ -92,10 +92,17 @@ export function useEstimateCallback(
         fromAmount?.raw.toString(),
         fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
         distribution.map(x => x.toString()),
+        //
         flags.toString()
       ];
 
-      const safeGasEstimate = contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
+      // estimate
+      return contract.estimateGas['swap'](
+        ...args,
+        value && !value.isZero()
+          ? { value, from: account }
+          : {from: account}
+        )
         .then((gas) => {
           const x = calculateGasMargin(gas)
           return x.toNumber()
@@ -104,8 +111,6 @@ export function useEstimateCallback(
           console.error(`estimateGas failed for ${'swap'}`, error)
           return undefined
         })
-
-      return safeGasEstimate;
     }
 
     const flags = [
@@ -115,11 +120,13 @@ export function useEstimateCallback(
     ];
 
     const regularFlags = bitwiseOrOnJSBI(...flags);
-    console.log(`regular=`,regularFlags.toString(16));
 
     const chiFlags = bitwiseOrOnJSBI(
       ...flags,
-      ...[FLAG_ENABLE_CHI_BURN, FLAG_ENABLE_CHI_BURN_BY_ORIGIN]
+      ...[
+        FLAG_ENABLE_CHI_BURN,
+        FLAG_ENABLE_CHI_BURN_BY_ORIGIN
+      ]
     );
 
     console.log(`chi=`, chiFlags.toString(16));
@@ -174,29 +181,104 @@ export function useSwapCallback(
         throw new Error('Failed to get a swap contract')
       }
 
-      const args: any[] = []
+      let value: BigNumber | undefined
+      if (trade.inputAmount.token.symbol === 'ETH') {
+        value = BigNumber.from(fromAmount.raw.toString())
+      }
+
+      const estimateSwap = (args: any[]) => {
+        return contract.estimateGas['swap'](
+          ...args,
+          value && !value.isZero()
+            ? { value, from: account }
+            : {from: account}
+        )
+          .then((gas) => {
+            const x = calculateGasMargin(gas)
+            return x.toNumber()
+          })
+          .catch(error => {
+            console.error(`estimateGas failed for ${'swap'}`, error)
+            return undefined
+          })
+      }
+
+      const onSuccess = (response: any) => {
+        const inputSymbol = trade.inputAmount.token.symbol
+        const outputSymbol = trade.outputAmount.token.symbol
+        const inputAmount = trade.inputAmount.toSignificant(3)
+        const outputAmount = trade.outputAmount.toSignificant(3)
+
+        const withRecipient = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
+
+        const withVersion =
+          tradeVersion === Version.v2 ? withRecipient : `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`
+
+        addTransaction(response, {
+          summary: withVersion
+        })
+      }
+
+      const onError = (error: any) => {
+        // if the user rejected the tx, pass this along
+        if (error?.code === 4001) {
+          throw error
+        }
+        // otherwise, the error was unexpected and we need to convey that
+        else {
+          // console.error(`Swap failed`, error, 'swap', args, value)
+          throw Error('An error occurred while swapping. Please contact support.')
+        }
+      }
+
       if (isOneSplit) {
 
         const flags = [
           FLAG_DISABLE_ALL_WRAP_SOURCES,
           FLAG_DISABLE_ALL_SPLIT_SOURCES,
           FLAG_DISABLE_MOONISWAP_ALL,
-          useChi ? FLAG_ENABLE_CHI_BURN : JSBI.BigInt(0),
-          useChi ? FLAG_ENABLE_CHI_BURN_BY_ORIGIN : JSBI.BigInt(0)
         ];
 
-        args.push(...[
+        // First attempt to estimate when CHI is set
+        const args = [
           trade.inputAmount.token.address,
           trade.outputAmount.token.address,
           fromAmount?.raw.toString(),
           fromAmount.multiply(String(10000 - allowedSlippage)).divide(String(10000)).toFixed(0),
           distribution.map(x => x.toString()),
-          bitwiseOrOnJSBI(...flags).toString()
-        ])
-        //
-        // console.log('flags send=', bitwiseOrOnJSBI(...flags).toString(16))
-        //
+          bitwiseOrOnJSBI(
+            ...flags,
+            FLAG_ENABLE_CHI_BURN,
+            FLAG_ENABLE_CHI_BURN_BY_ORIGIN
+          ).toString()
+        ];
+
+        return estimateSwap(args).then((result) => {
+          const gasLimit = calculateGasMargin(BigNumber.from(result));
+          // If we are good with CHI -> execute
+          return contract['swap'](...args, {
+            gasLimit,
+            ...(value && !value.isZero() ? { value } : {})
+          })
+            .then(onSuccess)
+            .catch(onError)
+
+        }, () => {
+          // If we aren't then estimate without CHI
+          return estimateSwap(args).then((result) => {
+              args[5] = bitwiseOrOnJSBI(...flags).toString();
+              const gasLimit = calculateGasMargin(BigNumber.from(result));
+              return contract['swap'](...args, {
+                gasLimit,
+                ...(value && !value.isZero() ? { value } : {})
+              })
+          })
+            .then(onSuccess)
+            .catch(onError)
+        })
+
       } else {
+
         const minReturn = BigNumber.from(trade.outputAmount.raw.toString())
           .mul(String(10000 - allowedSlippage)).div(String(10000))
 
@@ -206,66 +288,35 @@ export function useSwapCallback(
           referalAddress = getAddress(referalAddressStr)
         }
 
-        args.push(...[
+        const args = [
           trade.inputAmount.token.address,
           trade.outputAmount.token.address,
           fromAmount?.raw.toString(),
           minReturn.toString(),
           referalAddress
-        ])
-      }
+        ];
 
-      let value: BigNumber | undefined
-      if (trade.inputAmount.token.symbol === 'ETH') {
-        value = BigNumber.from(fromAmount.raw.toString())
-      }
-
-      const safeGasEstimate = contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
-        .then(calculateGasMargin)
-        .catch(error => {
-          console.error(`estimateGas failed for ${'swap'}`, error)
-          return undefined
-        })
-
-      if (BigNumber.isBigNumber(safeGasEstimate) && !BigNumber.isBigNumber(safeGasEstimate)) {
-        throw new Error(
-          'An error occurred. Please try raising your slippage. If that does not work, contact support.'
-        )
-      }
-
-      return contract['swap'](...args, {
-        gasLimit: safeGasEstimate,
-        ...(value && !value.isZero() ? { value } : {})
-      })
-        .then((response: any) => {
-          const inputSymbol = trade.inputAmount.token.symbol
-          const outputSymbol = trade.outputAmount.token.symbol
-          const inputAmount = trade.inputAmount.toSignificant(3)
-          const outputAmount = trade.outputAmount.toSignificant(3)
-
-          const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
-          const withRecipient = base
-
-          const withVersion =
-            tradeVersion === Version.v2 ? withRecipient : `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`
-
-          addTransaction(response, {
-            summary: withVersion
+        return contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
+          .then((result) => {
+            // if (BigNumber.isBigNumber(safeGasEstimate) && !BigNumber.isBigNumber(safeGasEstimate)) {
+            //   throw new Error(
+            //     'An error occurred. Please try raising your slippage. If that does not work, contact support.'
+            //   )
+            // }
+            const gasLimit = calculateGasMargin(BigNumber.from(result));
+            return contract['swap'](...args, {
+              gasLimit,
+              ...(value && !value.isZero() ? { value } : {})
+            })
+              .then(onSuccess)
+              .catch(onError)
           })
+          .catch(error => {
+            console.error(`estimateGas failed for ${'swap'}`, error)
+            return undefined
+          })
+      }
 
-          return response.hash
-        })
-        .catch((error: any) => {
-          // if the user rejected the tx, pass this along
-          if (error?.code === 4001) {
-            throw error
-          }
-          // otherwise, the error was unexpected and we need to convey that
-          else {
-            console.error(`Swap failed`, error, 'swap', args, value)
-            throw Error('An error occurred while swapping. Please contact support.')
-          }
-        })
     }
   }, [
     trade,

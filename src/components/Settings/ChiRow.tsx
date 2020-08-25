@@ -17,7 +17,7 @@ export function ChiStateControl({ state, approveCHI }) {
   if (state === ApprovalState.UNKNOWN) {
     return (
       <>
-        'loading'
+        loading
       </>
     )
   }
@@ -25,7 +25,7 @@ export function ChiStateControl({ state, approveCHI }) {
   if (state === ApprovalState.PENDING) {
     return (
       <>
-        'pending'
+        pending
       </>
     )
   }

@@ -155,15 +155,16 @@ export default function Swap() {
   // the callback to execute the swap
   const [isChiApplied, swapCallback, estimate] = useSwap(chainId, parsedAmount, trade, distribution, allowedSlippage)
 
-  const x = trade?.inputAmount?.toExact()
+  const srcAmount = trade?.inputAmount?.toExact()
 
   // TODO: for sure should be more elegant solution for estimation calls
   useEffect(() => {
     let unmounted = false;
 
     function handleStatusChange(result: number[]) {
-      // round
-      if(unmounted){
+
+
+      if (unmounted || !result || (!result[1])){
         return
       }
 
@@ -180,7 +181,7 @@ export default function Swap() {
       setGasWhenUseChi(gasWhenUseChi)
     }
 
-    x && estimate && estimate().then((x) => handleStatusChange(x))
+    srcAmount && estimate && estimate().then((result) => handleStatusChange(result))
 
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -188,7 +189,7 @@ export default function Swap() {
     };
 
     // eslint-disable-next-line
-  }, [x]);
+  }, [srcAmount]);
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
@@ -382,7 +383,7 @@ export default function Swap() {
                   </RowBetween>
 
                   {
-                    (isChiApplied)
+                    (isChiApplied && gas)
                       ? (
                         <RowBetween align="center">
                           <Text fontWeight={500} fontSize={14} color={theme.text2}>
