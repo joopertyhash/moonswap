@@ -11,6 +11,7 @@ import { ChainId, JSBI, Percent, Token, TokenAmount, ETHER } from '@uniswap/sdk'
 import { TokenAddressMap } from '../state/lists/hooks'
 import { V1_MOONISWAP_FACTORY_ADDRESSES } from '../constants/v1-mooniswap'
 import { ONE_SPLIT_ABI, ONE_SPLIT_ADDRESSES } from '../constants/one-split'
+import { MIGRATOR_ABI, MIGRATOR_ADDRESS } from '../constants/abis/migrator'
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -113,6 +114,10 @@ export function getRouterContract(_: number, library: Web3Provider, account?: st
 
 export function getOneSplit(chainId: ChainId, library: Web3Provider, account?: string) {
   return getContract(ONE_SPLIT_ADDRESSES[chainId], ONE_SPLIT_ABI, library, account)
+}
+
+export function getMooniswapMigratorContract(chainId: ChainId, library: Web3Provider, account?: string) {
+  return getContract(MIGRATOR_ADDRESS, MIGRATOR_ABI, library, account)
 }
 
 export function getMooniswapContract(_: number, library: Web3Provider, pairAddress: string, account?: string) {
