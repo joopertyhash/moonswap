@@ -134,7 +134,7 @@ export function useEstimateCallback(
       ]
     );
 
-    console.log(`chi=`, chiFlags.toString(16));
+    // console.log(`chi=`, chiFlags.toString(16));
 
     return () => {
       return Promise.all([
