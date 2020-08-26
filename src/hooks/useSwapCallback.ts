@@ -28,7 +28,7 @@ const bitwiseOrOnJSBI = (...items: JSBI[]): JSBI => {
 }
 
 export type SwapCallback = null | (() => Promise<string>);
-export type EstimateCallback = null | (() => Promise<Array<number|undefined> | undefined>);
+export type EstimateCallback = null | (() => Promise<Array<number | undefined> | undefined>);
 
 export type useSwapResult = [
   boolean,
@@ -50,11 +50,11 @@ export function useSwap(
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
   // TODO: Get from storage as well
-  const applyChi = !!(isOneSplit && (isChiApproved === ApprovalState.APPROVED) && hasEnoughChi);
+  const applyChi = !!(isOneSplit && (isChiApproved === ApprovalState.APPROVED) && hasEnoughChi)
 
   const estimate = useEstimateCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
   const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit,
-    // applyChi
+    //applyChi
   )
 
   return [applyChi, swapCallback, estimate]
@@ -90,7 +90,7 @@ export function useEstimateCallback(
       value = BigNumber.from(fromAmount.raw.toString())
     }
 
-    const estimateWithFlags = (flags: JSBI): Promise<number|undefined> => {
+    const estimateWithFlags = (flags: JSBI): Promise<number | undefined> => {
       const args: any[] = [
         trade.inputAmount.token.address,
         trade.outputAmount.token.address,
@@ -99,15 +99,15 @@ export function useEstimateCallback(
         distribution.map(x => x.toString()),
         //
         flags.toString()
-      ];
+      ]
 
       // estimate
       return contract.estimateGas['swap'](
         ...args,
         value && !value.isZero()
           ? { value, from: account }
-          : {from: account}
-        )
+          : { from: account }
+      )
         .then((gas) => {
           const x = calculateGasMargin(gas)
           return x.toNumber()
@@ -122,9 +122,9 @@ export function useEstimateCallback(
       FLAG_DISABLE_ALL_WRAP_SOURCES,
       FLAG_DISABLE_ALL_SPLIT_SOURCES,
       FLAG_DISABLE_MOONISWAP_ALL
-    ];
+    ]
 
-    const regularFlags = bitwiseOrOnJSBI(...flags);
+    const regularFlags = bitwiseOrOnJSBI(...flags)
 
     const chiFlags = bitwiseOrOnJSBI(
       ...flags,
@@ -132,7 +132,7 @@ export function useEstimateCallback(
         FLAG_ENABLE_CHI_BURN,
         FLAG_ENABLE_CHI_BURN_BY_ORIGIN
       ]
-    );
+    )
 
     // console.log(`chi=`, chiFlags.toString(16));
 
@@ -140,7 +140,7 @@ export function useEstimateCallback(
       return Promise.all([
         estimateWithFlags(regularFlags),
         estimateWithFlags(chiFlags)
-      ]);
+      ])
     }
   }, [
     trade,
@@ -197,7 +197,7 @@ export function useSwapCallback(
           ...args,
           value && !value.isZero()
             ? { value, from: account }
-            : {from: account}
+            : { from: account }
         )
           .then((gas) => {
             const x = calculateGasMargin(gas)
@@ -242,8 +242,8 @@ export function useSwapCallback(
         const flags = [
           FLAG_DISABLE_ALL_WRAP_SOURCES,
           FLAG_DISABLE_ALL_SPLIT_SOURCES,
-          FLAG_DISABLE_MOONISWAP_ALL,
-        ];
+          FLAG_DISABLE_MOONISWAP_ALL
+        ]
 
         // First attempt to estimate when CHI is set
         const args = [
@@ -257,30 +257,38 @@ export function useSwapCallback(
             FLAG_ENABLE_CHI_BURN,
             FLAG_ENABLE_CHI_BURN_BY_ORIGIN
           ).toString()
-        ];
+        ]
 
         return estimateSwap(args).then((result) => {
-          const gasLimit = calculateGasMargin(BigNumber.from(result));
-          // If we are good with CHI -> execute
-          return contract['swap'](...args, {
-            gasLimit,
-            ...(value && !value.isZero() ? { value } : {})
-          })
-            .then(onSuccess)
-            .catch(onError)
 
-        }, () => {
-          // If we aren't then estimate without CHI
-          return estimateSwap(args).then((result) => {
-              args[5] = bitwiseOrOnJSBI(...flags).toString();
-              const gasLimit = calculateGasMargin(BigNumber.from(result));
-              return contract['swap'](...args, {
-                gasLimit,
-                ...(value && !value.isZero() ? { value } : {})
+          if (!result) {
+            // If we aren't then estimate without CHI, change args
+            args[5] = bitwiseOrOnJSBI(...flags).toString()
+            return estimateSwap(args).then((result) => {
+                const gasLimit = calculateGasMargin(BigNumber.from(result))
+                return contract['swap'](...args, {
+                  gasLimit,
+                  ...(value && !value.isZero() ? { value } : {})
+                })
               })
-          })
-            .then(onSuccess)
-            .catch(onError)
+              .then(onSuccess)
+              .catch(onError)
+          }
+          else {
+            // Estimate success witch CHI
+            const gasLimit = calculateGasMargin(
+              BigNumber.from(result)
+            )
+
+            // If we are good with CHI -> execute
+            return contract['swap'](...args, {
+              gasLimit,
+              ...(value && !value.isZero() ? { value } : {})
+            })
+              .then(onSuccess)
+              .catch(onError)
+          }
+
         })
 
       } else {
@@ -300,7 +308,7 @@ export function useSwapCallback(
           fromAmount?.raw.toString(),
           minReturn.toString(),
           referalAddress
-        ];
+        ]
 
         return contract.estimateGas['swap'](...args, value && !value.isZero() ? { value } : {})
           .then((result) => {
@@ -309,7 +317,7 @@ export function useSwapCallback(
             //     'An error occurred. Please try raising your slippage. If that does not work, contact support.'
             //   )
             // }
-            const gasLimit = calculateGasMargin(BigNumber.from(result));
+            const gasLimit = calculateGasMargin(BigNumber.from(result))
             return contract['swap'](...args, {
               gasLimit,
               ...(value && !value.isZero() ? { value } : {})
@@ -336,6 +344,6 @@ export function useSwapCallback(
     distribution,
     fromAmount,
     isOneSplit,
-    //useChi
+    // useChi
   ])
 }
