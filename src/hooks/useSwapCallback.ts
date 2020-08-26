@@ -48,10 +48,14 @@ export function useSwap(
   const isOneSplit = isUseOneSplitContract(distribution)
   const [isChiApproved] = useIsChiApproved(chainId || 0)
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
+
+  // TODO: Get from storage as well
   const applyChi = !!(isOneSplit && (isChiApproved === ApprovalState.APPROVED) && hasEnoughChi);
 
   const estimate = useEstimateCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit)
-  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit, applyChi)
+  const swapCallback = useSwapCallback(fromAmount, trade, distribution, allowedSlippage, isOneSplit,
+    // applyChi
+  )
 
   return [applyChi, swapCallback, estimate]
 }
@@ -65,12 +69,14 @@ export function useEstimateCallback(
   isOneSplit: boolean
 ): EstimateCallback {
 
+
   const { account, chainId, library } = useActiveWeb3React()
   const recipient = account
 
   const tradeVersion = getTradeVersion(trade)
 
   return useMemo(() => {
+
     if (!trade || !recipient || !library || !account || !tradeVersion || !chainId || !distribution || !fromAmount)
       return () => Promise.resolve(undefined)
 
@@ -83,7 +89,6 @@ export function useEstimateCallback(
     if (trade.inputAmount.token.symbol === 'ETH') {
       value = BigNumber.from(fromAmount.raw.toString())
     }
-
 
     const estimateWithFlags = (flags: JSBI): Promise<number|undefined> => {
       const args: any[] = [
@@ -158,7 +163,8 @@ export function useSwapCallback(
   distribution: BigNumber[] | undefined,
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips,
   isOneSplit: boolean,
-  useChi: boolean | undefined
+  // TODO: should be taked into consideration
+  //useChi: boolean | undefined
 ): SwapCallback {
   const { account, chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
@@ -330,6 +336,6 @@ export function useSwapCallback(
     distribution,
     fromAmount,
     isOneSplit,
-    useChi
+    //useChi
   ])
 }
