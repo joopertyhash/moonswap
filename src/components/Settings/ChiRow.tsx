@@ -7,6 +7,7 @@ import { TYPE } from '../../theme'
 import Toggle from '../Toggle'
 import { ThemeContext } from 'styled-components'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
+import Loader from '../Loader'
 
 export function ChiStateControl({ state, approveCHI }) {
 
@@ -14,18 +15,10 @@ export function ChiStateControl({ state, approveCHI }) {
   const [chiEnabledFlag, setChiEnabledFlag]
     = useLocalStorage('chiEnabled', false)
 
-  if (state === ApprovalState.UNKNOWN) {
+  if (state === ApprovalState.PENDING || state === ApprovalState.UNKNOWN) {
     return (
       <>
-        loading
-      </>
-    )
-  }
-
-  if (state === ApprovalState.PENDING) {
-    return (
-      <>
-        pending
+        <Loader />
       </>
     )
   }
@@ -35,7 +28,9 @@ export function ChiStateControl({ state, approveCHI }) {
       const newValue = !chiEnabledFlag;
       setChiEnabledFlag(newValue)
       if(newValue === true && !isApproved) {
-        approveCHI();
+        approveCHI().then(() => {
+          setChiEnabledFlag(true); // activate after approve
+        })
       }
     }}/>
   )
@@ -46,6 +41,7 @@ export function ChiRow() {
   const { chainId } = useWeb3React()
   const hasChi = useHasChi(0)
   const [approvalState, approveCHI] = useIsChiApproved(chainId);
+  //const approveCHI = ()
 
   const theme = useContext(ThemeContext)
 
@@ -54,7 +50,7 @@ export function ChiRow() {
       <RowFixed>
         <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
           {
-            hasChi ? 'Activate CHI' : `Don't have CHI to activate`
+            hasChi ? 'Use CHI' : `Don't have CHI to activate`
           }
         </TYPE.black>
       </RowFixed>
