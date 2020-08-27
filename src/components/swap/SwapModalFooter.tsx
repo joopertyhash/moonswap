@@ -98,17 +98,17 @@ export default function SwapModalFooter({
           </RowFixed>
           <FormattedPriceImpact priceImpact={priceImpactWithoutFee} />
         </RowBetween>
-        <RowBetween>
-          <RowFixed>
-            <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>
-              Liquidity Provider Fee
-            </TYPE.black>
-            <QuestionHelper text="A portion of each trade (0.30%) goes to liquidity providers as a protocol incentive." />
-          </RowFixed>
-          <TYPE.black fontSize={14}>
-            {realizedLPFee ? realizedLPFee?.toSignificant(6) + ' ' + trade?.inputAmount?.token?.symbol : '-'}
-          </TYPE.black>
-        </RowBetween>
+        {/*<RowBetween>*/}
+        {/*  <RowFixed>*/}
+        {/*    <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>*/}
+        {/*      Liquidity Provider Fee*/}
+        {/*    </TYPE.black>*/}
+        {/*    <QuestionHelper text="A portion of each trade (0.30%) goes to liquidity providers as a protocol incentive." />*/}
+        {/*  </RowFixed>*/}
+        {/*  <TYPE.black fontSize={14}>*/}
+        {/*    {realizedLPFee ? realizedLPFee?.toSignificant(6) + ' ' + trade?.inputAmount?.token?.symbol : '-'}*/}
+        {/*  </TYPE.black>*/}
+        {/*</RowBetween>*/}
       </AutoColumn>
 
       <AutoRow>
