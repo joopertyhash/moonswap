@@ -28,7 +28,6 @@ import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallbac
 import { TokenAmount } from '@uniswap/sdk'
 import { ONE_SPLIT_ADDRESSES } from '../../constants/one-split'
 import JSBI from 'jsbi'
-import { MaxUint256 } from '@ethersproject/constants'
 
 const IconWrapper = styled.div<{ size?: number }>`
   ${({ theme }) => theme.flexColumnNoWrap};
