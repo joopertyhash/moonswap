@@ -139,7 +139,7 @@ function ChiComponent() {
   const hasEnoughChi = useHasChi(MIN_CHI_BALANCE)
 
   const [approvalState] = useApproveCallback(
-    new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
+    new TokenAmount(CHI, JSBI.BigInt(MIN_CHI_BALANCE)),
     ONE_SPLIT_ADDRESSES[chainId]
   )
 

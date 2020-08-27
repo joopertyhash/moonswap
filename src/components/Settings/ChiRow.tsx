@@ -11,7 +11,7 @@ import Loader from '../Loader'
 
 export function ChiStateControl({ state, approveCHI }) {
 
-  const isApproved = state === ApprovalState.APPROVED;
+  const isApproved = (state === ApprovalState.APPROVED);
   const [chiEnabledFlag, setChiEnabledFlag]
     = useLocalStorage('chiEnabled', false)
 

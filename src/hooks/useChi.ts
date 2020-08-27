@@ -8,7 +8,7 @@ import { CHI } from '../constants'
 import { MaxUint256 } from '@ethersproject/constants'
 import { ONE_SPLIT_ADDRESSES } from '../constants/one-split'
 
-export const MIN_CHI_BALANCE = 5;
+export const MIN_CHI_BALANCE = 5
 
 export default function useChiBalance(): JSBI | undefined {
   const { account } = useActiveWeb3React()
@@ -25,8 +25,16 @@ export function useHasChi(minAmount: number): boolean | undefined {
 }
 
 export function useIsChiApproved(chainId: ChainId): [ApprovalState, () => Promise<void>] {
-  return useApproveCallback(
+
+  const [approvalState] = useApproveCallback(
+    new TokenAmount(CHI, JSBI.BigInt(MIN_CHI_BALANCE)),
+    ONE_SPLIT_ADDRESSES[chainId]
+  )
+
+  const [ , approve ] = useApproveCallback(
     new TokenAmount(CHI, JSBI.BigInt(MaxUint256)),
     ONE_SPLIT_ADDRESSES[chainId]
   )
+
+  return [approvalState, approve]
 }
