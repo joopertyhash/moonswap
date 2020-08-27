@@ -209,7 +209,7 @@ export function useSwapCallback(
           })
       }
 
-      const onSuccess = (response: any) => {
+      const onSuccess = (response: any): string => {
         const inputSymbol = trade.inputAmount.token.symbol
         const outputSymbol = trade.outputAmount.token.symbol
         const inputAmount = trade.inputAmount.toSignificant(3)
@@ -223,6 +223,8 @@ export function useSwapCallback(
         addTransaction(response, {
           summary: withVersion
         })
+
+        return response.hash
       }
 
       const onError = (error: any) => {
