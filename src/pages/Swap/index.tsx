@@ -18,12 +18,11 @@ import SwapModalFooter from '../../components/swap/SwapModalFooter'
 import SwapModalHeader from '../../components/swap/SwapModalHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { TokenWarningCards } from '../../components/TokenWarningCard'
-
 import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { isTradeBetter } from '../../data/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
-import { useSwapCallback } from '../../hooks/useSwapCallback'
+import { useSwap } from '../../hooks/useSwapCallback'
 import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -46,6 +45,7 @@ import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { isUseOneSplitContract } from '../../utils'
 import ReferralLink from '../../components/RefferalLink'
+import GasConsumption from '../../components/swap/GasConsumption'
 
 export default function Swap() {
   useDefaultsFromURLSearch()
@@ -65,6 +65,7 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue } = useSwapState()
+
   const { onSwitchTokens, onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const { v1Trade, v2Trade, mooniswapTrade, currencyBalances, parsedAmount, currencies, error } = useDerivedSwapInfo()
 
@@ -147,8 +148,48 @@ export default function Swap() {
     }
   }, [approval, approvalSubmitted])
 
+
+  const [gas, setGas] = useState(0)
+  const [gasWhenUseChi, setGasWhenUseChi] = useState(0)
+
   // the callback to execute the swap
-  const swapCallback = useSwapCallback(parsedAmount, trade, distribution, allowedSlippage)
+  const [isChiApplied, swapCallback, estimate] = useSwap(chainId, parsedAmount, trade, distribution, allowedSlippage)
+
+  const srcAmount = trade?.inputAmount?.toExact()
+
+  // TODO: for sure should be more elegant solution for estimation calls
+  useEffect(() => {
+    let unmounted = false;
+
+    function handleStatusChange(result: number[]) {
+
+
+      if (unmounted || !result || (!result[1])){
+        return
+      }
+
+      const gasWithoutChi = result[0];
+      const gasWithChi = result[1];
+
+      // As base gas amount on UI show the same amount of gas that metamask would show (red one)
+      const gas = Math.round(gasWithChi / 1000);
+
+      // Chi allow to safe up to 43% from original transaction (the one without CHI burn) green
+      const gasWhenUseChi = Math.round(gasWithoutChi * 0.57 / 1000);
+      //
+      setGas(gas);
+      setGasWhenUseChi(gasWhenUseChi)
+    }
+
+    srcAmount && estimate && estimate().then((result) => handleStatusChange(result))
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      unmounted = true;
+    };
+
+    // eslint-disable-next-line
+  }, [srcAmount]);
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
@@ -340,6 +381,21 @@ export default function Swap() {
                       setShowInverted={setShowInverted}
                     />
                   </RowBetween>
+
+                  {
+                    (isChiApplied && gas)
+                      ? (
+                        <RowBetween align="center">
+                          <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                            Gas consumption
+                          </Text>
+                          {
+                            <GasConsumption gas={gas} gasWhenUseChi={gasWhenUseChi}/>
+                          }
+                        </RowBetween>
+                      )
+                      : ('')
+                  }
 
                   {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (
                     <RowBetween align="center">

@@ -6,6 +6,7 @@ import MooniswapFactoryABI from '../constants/v1-mooniswap/v1_mooniswap_factory.
 import MooniswapHelperABI from '../constants/v1-mooniswap/MooniswapHelper.json'
 import { useMemo } from 'react'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
+import CHI_ABI from '../constants/abis/chi.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import ERC20_ABI from '../constants/abis/erc20.json'
 import { MIGRATOR_ABI, MIGRATOR_ADDRESS } from '../constants/abis/migrator'
@@ -107,4 +108,13 @@ export function useMooniswapContract(poolAddress?: string, withSignerIfPossible?
 export function useOneSplit(): Contract | null {
   const { chainId } = useActiveWeb3React()
   return useContract(chainId && ONE_SPLIT_ADDRESSES[chainId], ONE_SPLIT_ABI, false)
+}
+
+export function useChiController(): Contract | null {
+  const { chainId } = useActiveWeb3React()
+  return useContract(
+    chainId === ChainId.MAINNET ? '0x0000000000004946c0e9F43F4Dee607b0eF1fA1c' : undefined,
+    CHI_ABI,
+    false
+  )
 }
