@@ -553,7 +553,6 @@ export default function RemoveLiquidity({
                     { tokenB
                       ? pair
                         .priceOf(tokenB)
-                        .invert()
                         .toSignificant(6)
                       : '-' }{ ' ' }
                     { currencyA?.symbol }
