@@ -63,8 +63,8 @@ export default function MigrateV1() {
     }
 
     const lpToken = new Token(chainId, pair.pair, 18, 'UNI-V2', 'Uniswap V2');
-    const token0 = allTokens[pair.token0]
-    const token1 = allTokens[pair.token1]
+    const token0 = allTokens[pair.token0] || token
+    const token1 = allTokens[pair.token1] || token
     const bal = new TokenAmount(lpToken, pair.balance.toString())
     const card = (
       <UniV2PositionCard
