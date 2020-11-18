@@ -383,9 +383,9 @@ export default function WalletModal({
                 }}/>
               <span>
                 <b>I accept {'  '}
-                  <DocLink title="Terms of Use" href={process.env.PUBLIC_URL + '/docs/Mooniswap_Terms_of_Use.pdf'} />
+                  <DocLink title="Terms of Service" href={process.env.PUBLIC_URL + '/docs/ToS_Mooniswap.pdf'} />
                   {'  '} and {'  '}
-                  <DocLink title="Privacy Policy" href={process.env.PUBLIC_URL + '/docs/Mooniswap_Privacy_Policy.pdf'} />
+                  <DocLink title="Privacy Policy" href={process.env.PUBLIC_URL + '/docs/PP_Mooniswap.pdf'} />
                 </b>
             </span>
             </label>
