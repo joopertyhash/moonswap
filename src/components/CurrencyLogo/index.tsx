@@ -8,7 +8,7 @@ const getTokenLogoURL = address =>
   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
 
 const getTokenLogoURL1inch = address =>
-  `https://1inch.exchange/assets/tokens/${address.toLowerCase()}.png`
+  `https://tokens.1inch.exchange/${address.toLowerCase()}.png`
 
 const BAD_URIS: { [tokenAddress: string]: true } = {}
 const FALLBACK_URIS: { [tokenAddress: string]: string } = {}
