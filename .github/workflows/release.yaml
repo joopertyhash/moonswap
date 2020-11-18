@@ -69,7 +69,7 @@ jobs:
 #        with:
 #          cid: ${{ steps.upload.outputs.hash }}
 
-      - uses: chrislennon/action-aws-cli@v1.1
+      - uses: 1inch-exchange/aws-cli@v1.0.3
       - name: Deploy
         run: |
           aws s3 sync ./build/ s3://mooniswap.exchange --delete --exact-timestamps
